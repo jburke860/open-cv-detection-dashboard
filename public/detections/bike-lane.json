@@ -1,0 +1,144 @@
+{
+  "id": "bike-lane",
+  "image": "/images/bike-lane.jpg",
+  "title": "Bike Lane",
+  "description": "Urban bike lane with cyclists, pedestrians, and street context",
+  "width": 756,
+  "height": 1161,
+  "model": "YOLOv8n",
+  "generatedBy": "Ultralytics YOLOv8 local inference (scripts/generate_detections.py)",
+  "detections": [
+    {
+      "id": 1,
+      "label": "bicycle",
+      "confidence": 0.9199,
+      "box": {
+        "x": 211,
+        "y": 686,
+        "width": 120,
+        "height": 119
+      }
+    },
+    {
+      "id": 2,
+      "label": "person",
+      "confidence": 0.8388,
+      "box": {
+        "x": 229,
+        "y": 610,
+        "width": 100,
+        "height": 161
+      }
+    },
+    {
+      "id": 3,
+      "label": "person",
+      "confidence": 0.7193,
+      "box": {
+        "x": 487,
+        "y": 611,
+        "width": 68,
+        "height": 179
+      }
+    },
+    {
+      "id": 4,
+      "label": "bicycle",
+      "confidence": 0.6642,
+      "box": {
+        "x": 469,
+        "y": 688,
+        "width": 87,
+        "height": 132
+      }
+    },
+    {
+      "id": 5,
+      "label": "person",
+      "confidence": 0.6308,
+      "box": {
+        "x": 0,
+        "y": 609,
+        "width": 20,
+        "height": 187
+      }
+    },
+    {
+      "id": 6,
+      "label": "person",
+      "confidence": 0.6301,
+      "box": {
+        "x": 612,
+        "y": 610,
+        "width": 34,
+        "height": 85
+      }
+    },
+    {
+      "id": 7,
+      "label": "person",
+      "confidence": 0.6143,
+      "box": {
+        "x": 553,
+        "y": 628,
+        "width": 30,
+        "height": 80
+      }
+    },
+    {
+      "id": 8,
+      "label": "person",
+      "confidence": 0.5891,
+      "box": {
+        "x": 642,
+        "y": 620,
+        "width": 41,
+        "height": 96
+      }
+    },
+    {
+      "id": 9,
+      "label": "bicycle",
+      "confidence": 0.5525,
+      "box": {
+        "x": 634,
+        "y": 666,
+        "width": 47,
+        "height": 77
+      }
+    },
+    {
+      "id": 10,
+      "label": "person",
+      "confidence": 0.5338,
+      "box": {
+        "x": 724,
+        "y": 624,
+        "width": 21,
+        "height": 57
+      }
+    },
+    {
+      "id": 11,
+      "label": "person",
+      "confidence": 0.4969,
+      "box": {
+        "x": 413,
+        "y": 651,
+        "width": 18,
+        "height": 51
+      }
+    },
+    {
+      "id": 12,
+      "label": "person",
+      "confidence": 0.2818,
+      "box": {
+        "x": 696,
+        "y": 630,
+        "width": 26,
+        "height": 51
+      }
+    }
+  ]
+}

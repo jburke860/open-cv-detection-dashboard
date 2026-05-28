@@ -1,0 +1,320 @@
+{
+  "id": "city-street",
+  "image": "/images/city-street.jpg",
+  "title": "City Street",
+  "description": "Urban roadway with vehicles, pedestrians, and traffic signals",
+  "width": 1280,
+  "height": 853,
+  "model": "YOLOv8n",
+  "generatedBy": "Ultralytics YOLOv8 local inference (scripts/generate_detections.py)",
+  "detections": [
+    {
+      "id": 1,
+      "label": "car",
+      "confidence": 0.869,
+      "box": {
+        "x": 1173,
+        "y": 602,
+        "width": 107,
+        "height": 98
+      }
+    },
+    {
+      "id": 2,
+      "label": "car",
+      "confidence": 0.7871,
+      "box": {
+        "x": 1038,
+        "y": 580,
+        "width": 145,
+        "height": 94
+      }
+    },
+    {
+      "id": 3,
+      "label": "car",
+      "confidence": 0.7453,
+      "box": {
+        "x": 693,
+        "y": 586,
+        "width": 52,
+        "height": 40
+      }
+    },
+    {
+      "id": 4,
+      "label": "car",
+      "confidence": 0.7162,
+      "box": {
+        "x": 603,
+        "y": 585,
+        "width": 53,
+        "height": 40
+      }
+    },
+    {
+      "id": 5,
+      "label": "car",
+      "confidence": 0.6991,
+      "box": {
+        "x": 971,
+        "y": 577,
+        "width": 100,
+        "height": 83
+      }
+    },
+    {
+      "id": 6,
+      "label": "traffic light",
+      "confidence": 0.6329,
+      "box": {
+        "x": 295,
+        "y": 414,
+        "width": 21,
+        "height": 43
+      }
+    },
+    {
+      "id": 7,
+      "label": "car",
+      "confidence": 0.5383,
+      "box": {
+        "x": 466,
+        "y": 580,
+        "width": 59,
+        "height": 50
+      }
+    },
+    {
+      "id": 8,
+      "label": "traffic light",
+      "confidence": 0.5311,
+      "box": {
+        "x": 831,
+        "y": 429,
+        "width": 18,
+        "height": 41
+      }
+    },
+    {
+      "id": 9,
+      "label": "car",
+      "confidence": 0.4767,
+      "box": {
+        "x": 665,
+        "y": 585,
+        "width": 29,
+        "height": 22
+      }
+    },
+    {
+      "id": 10,
+      "label": "car",
+      "confidence": 0.4542,
+      "box": {
+        "x": 865,
+        "y": 596,
+        "width": 51,
+        "height": 33
+      }
+    },
+    {
+      "id": 11,
+      "label": "traffic light",
+      "confidence": 0.4479,
+      "box": {
+        "x": 830,
+        "y": 427,
+        "width": 20,
+        "height": 55
+      }
+    },
+    {
+      "id": 12,
+      "label": "person",
+      "confidence": 0.4477,
+      "box": {
+        "x": 86,
+        "y": 579,
+        "width": 33,
+        "height": 80
+      }
+    },
+    {
+      "id": 13,
+      "label": "person",
+      "confidence": 0.4454,
+      "box": {
+        "x": 562,
+        "y": 578,
+        "width": 33,
+        "height": 61
+      }
+    },
+    {
+      "id": 14,
+      "label": "person",
+      "confidence": 0.429,
+      "box": {
+        "x": 6,
+        "y": 589,
+        "width": 29,
+        "height": 78
+      }
+    },
+    {
+      "id": 15,
+      "label": "traffic light",
+      "confidence": 0.3917,
+      "box": {
+        "x": 498,
+        "y": 422,
+        "width": 19,
+        "height": 39
+      }
+    },
+    {
+      "id": 16,
+      "label": "car",
+      "confidence": 0.3882,
+      "box": {
+        "x": 535,
+        "y": 585,
+        "width": 37,
+        "height": 36
+      }
+    },
+    {
+      "id": 17,
+      "label": "person",
+      "confidence": 0.3815,
+      "box": {
+        "x": 419,
+        "y": 591,
+        "width": 22,
+        "height": 41
+      }
+    },
+    {
+      "id": 18,
+      "label": "person",
+      "confidence": 0.376,
+      "box": {
+        "x": 119,
+        "y": 568,
+        "width": 28,
+        "height": 68
+      }
+    },
+    {
+      "id": 19,
+      "label": "car",
+      "confidence": 0.3636,
+      "box": {
+        "x": 844,
+        "y": 596,
+        "width": 71,
+        "height": 34
+      }
+    },
+    {
+      "id": 20,
+      "label": "person",
+      "confidence": 0.3389,
+      "box": {
+        "x": 36,
+        "y": 575,
+        "width": 35,
+        "height": 103
+      }
+    },
+    {
+      "id": 21,
+      "label": "person",
+      "confidence": 0.3199,
+      "box": {
+        "x": 178,
+        "y": 573,
+        "width": 18,
+        "height": 82
+      }
+    },
+    {
+      "id": 22,
+      "label": "traffic light",
+      "confidence": 0.3008,
+      "box": {
+        "x": 333,
+        "y": 456,
+        "width": 15,
+        "height": 30
+      }
+    },
+    {
+      "id": 23,
+      "label": "traffic light",
+      "confidence": 0.2915,
+      "box": {
+        "x": 481,
+        "y": 420,
+        "width": 15,
+        "height": 39
+      }
+    },
+    {
+      "id": 24,
+      "label": "person",
+      "confidence": 0.2913,
+      "box": {
+        "x": 309,
+        "y": 578,
+        "width": 20,
+        "height": 54
+      }
+    },
+    {
+      "id": 25,
+      "label": "car",
+      "confidence": 0.2811,
+      "box": {
+        "x": 805,
+        "y": 586,
+        "width": 42,
+        "height": 38
+      }
+    },
+    {
+      "id": 26,
+      "label": "person",
+      "confidence": 0.281,
+      "box": {
+        "x": 1202,
+        "y": 577,
+        "width": 21,
+        "height": 28
+      }
+    },
+    {
+      "id": 27,
+      "label": "person",
+      "confidence": 0.2591,
+      "box": {
+        "x": 565,
+        "y": 577,
+        "width": 25,
+        "height": 57
+      }
+    },
+    {
+      "id": 28,
+      "label": "car",
+      "confidence": 0.227,
+      "box": {
+        "x": 774,
+        "y": 584,
+        "width": 29,
+        "height": 30
+      }
+    }
+  ]
+}
