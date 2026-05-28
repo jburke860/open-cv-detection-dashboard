@@ -247,7 +247,3 @@ Potential future extensions include:
 ## Image attribution
 
 Sample images are public, non-sensitive urban-scene images used for portfolio demonstration. If image sources require attribution, list them here before publishing the repository.
-
-## License
-
-MIT License. Add a `LICENSE` file before publishing the repository publicly.
