@@ -244,6 +244,3 @@ Potential future extensions include:
 * Larger public urban-scene image set
 * Optional security-oriented monitoring workflows after the static visualization MVP is complete
 
-## Image attribution
-
-Sample images are public, non-sensitive urban-scene images used for portfolio demonstration. If image sources require attribution, list them here before publishing the repository.
