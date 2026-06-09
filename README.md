@@ -1,15 +1,19 @@
 # Open Computer Vision Detection Dashboard
 
-A static/local computer vision dashboard that visualizes **precomputed YOLO object-detection results** on public urban-scene images. Built as a portfolio MVP to demonstrate computer vision output interpretation, bounding-box rendering, confidence scoring, class summaries, and frontend dashboard engineering — without cloud deployment, user accounts, private datasets, or live model hosting.
+A deployed computer vision dashboard that visualizes **precomputed YOLOv8 object-detection results** on public urban-scene images. Built as a portfolio project to demonstrate computer vision output interpretation, bounding-box rendering, confidence scoring, class summaries, and frontend dashboard engineering without user accounts, private datasets, databases, or live model hosting.
+
+## Live demo
+
+[View the deployed dashboard](https://open-cv-detection-dashboard.vercel.app)
 
 ## Why I built it
 
-This project complements my [Technical Paper AI Search Assistant](https://github.com/jburke860/technical-paper-ai-search) portfolio build.
+This project complements my [Technical Paper AI Search Assistant](https://github.com/jburke860/technical-paper-ai-search) portfolio build by showing a different applied AI workflow: computer vision result review instead of document retrieval.
 
 | Project                                      | Focus                                                                                            |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | Technical Paper AI Search Assistant          | RAG, PDF processing, hybrid retrieval, local LLMs, backend APIs                                  |
-| **Open Computer Vision Detection Dashboard** | Computer vision, model output visualization, bounding boxes, confidence scores, and dashboard UI |
+| **Open Computer Vision Detection Dashboard** | Computer vision, model-output visualization, bounding boxes, confidence scores, and dashboard UI |
 
 The goal of this project is not to build a production surveillance system. The goal is to show how object-detection outputs can be inspected, visualized, and summarized in a clean technical interface.
 
@@ -29,6 +33,7 @@ The goal of this project is not to build a production surveillance system. The g
 
 ## Current features
 
+* Deployed Next.js dashboard hosted on Vercel
 * Public urban-scene image gallery
 * Precomputed YOLOv8 detection JSON files
 * Detection viewer with scaled bounding boxes
@@ -51,7 +56,7 @@ The goal of this project is not to build a production surveillance system. The g
 Public urban-scene images
         │
         ▼
-Local YOLOv8 inference script
+Optional local YOLOv8 inference script
         │
         ▼
 Precomputed JSON detection files
@@ -60,7 +65,7 @@ Precomputed JSON detection files
 Next.js dashboard
         │
         ▼
-Browser visualization
+Deployed browser visualization
 Bounding boxes · labels · confidence scores · summary cards · results table
 ```
 
@@ -71,6 +76,7 @@ Bounding boxes · labels · confidence scores · summary cards · results table
 * **Tailwind CSS**
 * **Static JSON detection artifacts**
 * **YOLOv8n** through Ultralytics for optional local detection generation
+* **Vercel** for static frontend deployment
 * **Public, non-sensitive sample images**
 
 ## Project structure
@@ -127,9 +133,15 @@ npm run build
 npm start
 ```
 
+## Deployment
+
+This project is deployed as a static Next.js dashboard on Vercel.
+
+The deployed application loads public sample images and precomputed detection JSON files from the project’s static assets. It does not require a database, authentication system, backend API, GPU server, or cloud-hosted model.
+
 ## How detections were generated
 
-The dashboard uses **precomputed object-detection results**. This keeps the MVP lightweight and easy to run because reviewers do not need a GPU, model server, database, or cloud deployment.
+The dashboard uses **precomputed object-detection results**. This keeps the deployed demo lightweight and easy to review because visitors do not need a GPU, model server, database, or local ML environment.
 
 The workflow is:
 
@@ -201,21 +213,23 @@ Bounding-box coordinates use **source image pixels**. The dashboard scales each 
 4. Compare summary cards for total detections, unique classes, highest confidence, and average confidence.
 5. Browse the full detection table for class labels, confidence scores, and box coordinates.
 
-## Current MVP scope
+## Current demo scope
 
-This is intentionally a **static/local MVP**.
+This is intentionally a **deployed portfolio demo** focused on object-detection visualization and review.
 
 Included:
 
 * Public sample images
-* Precomputed YOLO detections
-* Static JSON files
+* Precomputed YOLOv8 detections
+* Static JSON detection files
 * Browser-based visualization
-* Local dashboard workflow
+* Hosted frontend demo
+* Optional local detection regeneration workflow
 
 Not included:
 
 * live webcam inference
+* live browser inference
 * user uploads
 * authentication
 * database storage
@@ -229,18 +243,18 @@ Not included:
 * Some low-confidence detections may be imperfect.
 * The dashboard visualizes precomputed detections rather than running live inference in the browser.
 * The project is not positioned as production-ready surveillance or security software.
-* The image set is intentionally small to keep the MVP focused and easy to review.
+* The image set is intentionally small to keep the demo focused and easy to review.
 
 ## Future improvements
 
 Potential future extensions include:
 
-* Live video or webcam inference
-* FastAPI backend for model serving
 * Confidence threshold slider
 * Class-based filtering
 * Side-by-side model comparison
 * Detection export tools
 * Larger public urban-scene image set
-* Optional security-oriented monitoring workflows after the static visualization MVP is complete
-
+* FastAPI backend for optional model serving
+* Live video or webcam inference
+* User image upload workflow
+* Optional security-oriented monitoring workflows after the static visualization demo is complete
