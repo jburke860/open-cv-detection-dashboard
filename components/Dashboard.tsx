@@ -72,7 +72,7 @@ export function Dashboard() {
       <header className="border-b border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
           <p className="text-sm font-medium uppercase tracking-[0.2em] text-cyan-400">
-            Portfolio project • Local MVP
+            Portfolio project • Live <Demo></Demo>
           </p>
           <h1 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Open Computer Vision Detection Dashboard
@@ -206,7 +206,7 @@ export function Dashboard() {
       </main>
 
       <footer className="border-t border-slate-800 py-6 text-center text-xs text-slate-500">
-        Open CV Detection Dashboard • Static local MVP • Public urban scene samples
+        Open CV Detection Dashboard • Live Demo • Public urban scene samples
       </footer>
     </div>
   );
