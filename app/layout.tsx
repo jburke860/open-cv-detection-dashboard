@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Open CV Detection Dashboard",
   description:
-    "Static Next.js dashboard for visualizing precomputed YOLO object detections on public urban-scene images.",
+    "Firebase-ready OpenCV dashboard for image upload jobs, YOLO detection results, and annotated artifact downloads.",
 };
 
 export default function RootLayout({

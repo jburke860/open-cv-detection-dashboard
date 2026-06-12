@@ -1,6 +1,8 @@
 # Open Computer Vision Detection Dashboard
 
-A deployed computer vision dashboard that visualizes **precomputed YOLOv8 object-detection results** on public urban-scene images. Built as a portfolio project to demonstrate computer vision output interpretation, bounding-box rendering, confidence scoring, class summaries, and frontend dashboard engineering without user accounts, private datasets, databases, or live model hosting.
+Made by Jeremy Burke.
+
+A computer vision dashboard for reviewing YOLOv8 object-detection results. The current app includes a Firebase-ready one-image upload pipeline, downloadable result artifacts, and stable precomputed public samples for portfolio review.
 
 ## Live demo
 
@@ -16,6 +18,22 @@ This project complements my [Technical Paper AI Search Assistant](https://github
 | **Open Computer Vision Detection Dashboard** | Computer vision, model-output visualization, bounding boxes, confidence scores, and dashboard UI |
 
 The goal of this project is not to build a production surveillance system. The goal is to show how object-detection outputs can be inspected, visualized, and summarized in a clean technical interface.
+
+## Demo direction
+
+The Technical Paper AI Research Assistant should stay a strong local demo for now because it depends on Ollama, local model files, local PDFs, embeddings, and heavier storage/compute.
+
+This OpenCV dashboard is the better candidate for the next true live demo because it can show a complete image-processing pipeline:
+
+1. User uploads one image.
+2. Frontend writes the image to Firebase Cloud Storage.
+3. Frontend creates a Firestore detection job.
+4. Cloud Run runs Python, FastAPI, OpenCV, and YOLO.
+5. Cloud Run saves an annotated image plus JSON/CSV result artifacts.
+6. Firestore job status updates from queued to running to complete or failed.
+7. User downloads the annotated image, JSON detections, and CSV detections.
+
+YOLO can run in the browser with ONNX Runtime Web, but the Firebase plus Cloud Run path is better for this portfolio app because it demonstrates frontend upload handling, object storage, async job state, a containerized inference service, and downloadable artifacts.
 
 ## Screenshots
 
@@ -34,11 +52,18 @@ The goal of this project is not to build a production surveillance system. The g
 ## Current features
 
 * Deployed Next.js dashboard hosted on Vercel
+* One-image upload UI
+* Firebase Storage and Firestore client adapter
+* Optional Cloud Run API handoff through `NEXT_PUBLIC_DETECTION_API_URL`
+* Firestore job status display
 * Public urban-scene image gallery
 * Precomputed YOLOv8 detection JSON files
 * Detection viewer with scaled bounding boxes
 * Object labels and confidence scores rendered over images
 * Hoverable detected-object list synced with box highlights
+* Confidence threshold slider
+* Annotated image export
+* JSON and CSV detection exports
 * Summary cards for:
 
   * total detections
@@ -51,6 +76,32 @@ The goal of this project is not to build a production surveillance system. The g
 * Optional Python script to regenerate detections locally
 
 ## Architecture
+
+Upload inference architecture:
+
+```text
+User uploads image
+        │
+        ▼
+Firebase Cloud Storage
+        │
+        │ create detection job
+        ▼
+Firestore job record: queued / running / complete / failed
+        │
+        │ trigger or API call
+        ▼
+Cloud Run Python/FastAPI/OpenCV/YOLO service
+        │
+        │ saves annotated image + JSON/CSV result
+        ▼
+Firebase Storage + Firestore
+        │
+        ▼
+User downloads result from dashboard
+```
+
+Static sample architecture:
 
 ```text
 Public urban-scene images
@@ -74,6 +125,8 @@ Bounding boxes · labels · confidence scores · summary cards · results table
 * **Next.js** with App Router
 * **TypeScript**
 * **Tailwind CSS**
+* **Firebase SDK** for Storage, Firestore, and anonymous auth
+* **Cloud Run** target for containerized Python/FastAPI/OpenCV/YOLO inference
 * **Static JSON detection artifacts**
 * **YOLOv8n** through Ultralytics for optional local detection generation
 * **Vercel** for static frontend deployment
@@ -89,11 +142,15 @@ open-cv-detection-dashboard/
 │   └── globals.css
 ├── components/
 │   ├── Dashboard.tsx
+│   ├── UploadInferencePanel.tsx
+│   ├── DetectionControls.tsx
 │   ├── DetectionViewer.tsx
 │   ├── DetectionSummaryCards.tsx
 │   ├── DetectionTable.tsx
 │   └── ImageSelector.tsx
 ├── lib/
+│   ├── detectionArtifacts.ts
+│   ├── detectionPipeline.ts
 │   ├── detectionTypes.ts
 │   └── detectionUtils.ts
 ├── public/
@@ -106,6 +163,7 @@ open-cv-detection-dashboard/
 │   └── requirements.txt
 ├── images/
 │   └── readme-screenshots/
+├── .env.example
 └── README.md
 ```
 
@@ -118,6 +176,12 @@ git clone https://github.com/jburke860/open-cv-detection-dashboard.git
 cd open-cv-detection-dashboard
 npm install
 npm run dev
+```
+
+Copy the environment example when wiring Firebase:
+
+```bash
+cp .env.example .env.local
 ```
 
 Open the local app:
@@ -137,7 +201,61 @@ npm start
 
 This project is deployed as a static Next.js dashboard on Vercel.
 
-The deployed application loads public sample images and precomputed detection JSON files from the project’s static assets. It does not require a database, authentication system, backend API, GPU server, or cloud-hosted model.
+Without Firebase environment variables, the deployed app still loads public sample images and precomputed detection JSON files from static assets. With Firebase configured, the upload panel can create real detection jobs and listen for result status.
+
+## Firebase and Cloud Run setup
+
+Required frontend environment variables:
+
+```text
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+```
+
+Optional Cloud Run endpoint:
+
+```text
+NEXT_PUBLIC_DETECTION_API_URL=https://your-cloud-run-service-url
+```
+
+If `NEXT_PUBLIC_DETECTION_API_URL` is set, the frontend calls:
+
+```http
+POST /jobs
+Content-Type: application/json
+```
+
+```json
+{
+  "jobId": "firestore-job-id",
+  "inputPath": "detection-jobs/{uid}/{jobId}/input/image.jpg",
+  "outputPrefix": "detection-jobs/{uid}/{jobId}/output",
+  "confidenceThreshold": 0.25,
+  "originalName": "image.jpg"
+}
+```
+
+The Cloud Run service should update `detectionJobs/{jobId}` in Firestore:
+
+```json
+{
+  "status": "complete",
+  "result": {
+    "annotatedImagePath": "detection-jobs/{uid}/{jobId}/output/annotated.png",
+    "jsonPath": "detection-jobs/{uid}/{jobId}/output/detections.json",
+    "csvPath": "detection-jobs/{uid}/{jobId}/output/detections.csv",
+    "width": 1280,
+    "height": 720,
+    "detections": []
+  }
+}
+```
+
+Use `status: "failed"` and an `error` string when inference fails.
 
 ## How detections were generated
 
@@ -219,6 +337,11 @@ This is intentionally a **deployed portfolio demo** focused on object-detection 
 
 Included:
 
+* One-image upload panel
+* Firebase-ready upload and job creation adapter
+* Firestore job listener
+* Cloud Run API handoff contract
+* Result artifact download UI
 * Public sample images
 * Precomputed YOLOv8 detections
 * Static JSON detection files
@@ -229,19 +352,18 @@ Included:
 Not included:
 
 * live webcam inference
-* live browser inference
-* user uploads
-* authentication
-* database storage
+* deployed Cloud Run inference service
+* Firebase project configuration in this repo
+* production authentication beyond anonymous Firebase sign-in
 * production monitoring
-* cloud model hosting
 * private or sensitive image data
 
 ## Limitations
 
 * Detection quality depends on the chosen sample images, YOLOv8n model behavior, and confidence threshold.
 * Some low-confidence detections may be imperfect.
-* The dashboard visualizes precomputed detections rather than running live inference in the browser.
+* The upload UI requires Firebase environment variables before it can create real jobs.
+* The inference path requires a separately deployed Cloud Run service.
 * The project is not positioned as production-ready surveillance or security software.
 * The image set is intentionally small to keep the demo focused and easy to review.
 
@@ -249,12 +371,12 @@ Not included:
 
 Potential future extensions include:
 
-* Confidence threshold slider
+* Deploy Python/FastAPI/OpenCV/YOLO service on Cloud Run
+* Add Firebase Storage and Firestore security rules
+* Add job cancellation and retry
 * Class-based filtering
 * Side-by-side model comparison
-* Detection export tools
 * Larger public urban-scene image set
-* FastAPI backend for optional model serving
 * Live video or webcam inference
-* User image upload workflow
+* Optional YOLOv8 ONNX Runtime Web mode for small-model browser inference
 * Optional security-oriented monitoring workflows after the static visualization demo is complete

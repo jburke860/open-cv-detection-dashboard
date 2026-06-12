@@ -83,10 +83,6 @@ export function DetectionViewer({ data }: DetectionViewerProps) {
     };
   }, [data.id, data.image, updateDisplaySize]);
 
-  useEffect(() => {
-    setActiveId(null);
-  }, [data.id]);
-
   const sortedDetections = [...data.detections].sort(
     (a, b) => b.confidence - a.confidence
   );
