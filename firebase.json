@@ -1,0 +1,48 @@
+{
+  "firestore": {
+    "database": "(default)",
+    "location": "nam5",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "apphosting": {
+    "backendId": "open-cv-detection-dashboard",
+    "rootDir": "/",
+    "ignore": [
+      "node_modules",
+      "node_modules/**",
+      ".git",
+      ".git/**",
+      ".next",
+      ".next/**",
+      "out",
+      "out/**",
+      "build",
+      "build/**",
+      ".env",
+      ".env.*",
+      "!.env.example",
+      "firebase-debug.log",
+      "firebase-debug.*.log",
+      "*.log",
+      "data",
+      "data/**",
+      "images/readme-screenshots",
+      "images/readme-screenshots/**",
+      "yolov8n.pt",
+      "*.pt",
+      "*.onnx",
+      "*.weights",
+      "__pycache__",
+      "__pycache__/**",
+      "*.pyc",
+      ".venv",
+      ".venv/**",
+      "functions",
+      "functions/**"
+    ]
+  },
+  "storage": {
+    "rules": "storage.rules"
+  }
+}
