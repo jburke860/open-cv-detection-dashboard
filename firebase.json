@@ -7,7 +7,7 @@
   },
   "apphosting": {
     "backendId": "open-cv-detection-dashboard",
-    "rootDir": "/",
+    "rootDir": ".",
     "ignore": [
       "node_modules",
       "node_modules/**",
