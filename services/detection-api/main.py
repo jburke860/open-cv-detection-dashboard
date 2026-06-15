@@ -172,6 +172,10 @@ def process_job(req: JobRequest):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
 
+            suffix = Path(req.originalName or req.inputPath).suffix.lower()
+            if suffix not in {".jpg", ".jpeg", ".png", ".webp"}:
+                suffix = ".jpg"
+
             input_file = str(tmp / "input")
             annotated_file = str(tmp / "annotated.png")
             json_file = str(tmp / "detections.json")
