@@ -10,9 +10,6 @@ The project demonstrates a full image-inference workflow: a Next.js/TypeScript f
 
 [View the deployed dashboard](https://open-cv-detection-dashboard--open-cv-detection-dashboard.us-central1.hosted.app)
 
-## Repository
-
-[View the GitHub repository](https://github.com/jburke860/open-cv-detection-dashboard)
 
 ## What it does
 
