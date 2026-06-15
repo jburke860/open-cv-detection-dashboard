@@ -1,12 +1,19 @@
 rules_version = '2';
 
-// Craft rules based on data in your Firestore database
-// allow write: if firestore.get(
-//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
 service firebase.storage {
   match /b/{bucket}/o {
-    match /{allPaths=**} {
-      allow read, write: if false;
+    match /detection-jobs/{userId}/{jobId}/input/{fileName} {
+      allow read, write: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.size < 10 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    match /detection-jobs/{userId}/{jobId}/output/{fileName} {
+      allow read: if request.auth != null
+        && request.auth.uid == userId;
+
+      allow write: if false;
     }
   }
 }
