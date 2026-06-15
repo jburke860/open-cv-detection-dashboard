@@ -102,6 +102,15 @@ def write_csv(path: str, detections: list[dict]) -> None:
             )
 
 
+def get_input_suffix(original_name: Optional[str], input_path: str) -> str:
+    suffix = Path(original_name or input_path).suffix.lower()
+
+    if suffix not in {".jpg", ".jpeg", ".png", ".webp"}:
+        suffix = ".jpg"
+
+    return suffix
+
+
 def run_detection(input_path: str, annotated_path: str, confidence: float) -> dict:
     results = model.predict(
         source=input_path,
@@ -172,11 +181,9 @@ def process_job(req: JobRequest):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
 
-            suffix = Path(req.originalName or req.inputPath).suffix.lower()
-            if suffix not in {".jpg", ".jpeg", ".png", ".webp"}:
-                suffix = ".jpg"
+            suffix = get_input_suffix(req.originalName, req.inputPath)
 
-            input_file = str(tmp / "input")
+            input_file = str(tmp / f"input{suffix}")
             annotated_file = str(tmp / "annotated.png")
             json_file = str(tmp / "detections.json")
             csv_file = str(tmp / "detections.csv")
