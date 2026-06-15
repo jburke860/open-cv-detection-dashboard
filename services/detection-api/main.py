@@ -228,6 +228,11 @@ def process_job(req: JobRequest):
             }
 
     except Exception as exc:
+        import traceback
+
+        print("Detection job failed:", flush=True)
+        print(traceback.format_exc(), flush=True)
+
         update_job(
             req.jobId,
             {
