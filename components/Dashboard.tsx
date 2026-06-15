@@ -102,10 +102,8 @@ export function Dashboard() {
           <h1 className="mt-3 max-w-3xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Open Computer Vision Detection Dashboard
           </h1>
-          <p className="mt-4 max-w-3xl text-base leading-7 text-slate-300">
-            Upload-ready computer vision dashboard for a Firebase Storage,
-            Firestore, and Cloud Run YOLO/OpenCV pipeline, with static sample
-            detections kept below as a reliable public demo dataset.
+          <p className="mt-4 max-w-6xl text-base leading-7 text-slate-300">
+          Upload an image or select a built-in sample scene to run live YOLOv8 object detection through a Firebase + Cloud Run pipeline. The demo uses YOLOv8n pretrained weights for fast detection of common objects such as people, vehicles, bicycles, and traffic-scene elements, then returns an annotated image plus JSON and CSV detection outputs.
           </p>
           <div className="mt-6 flex flex-wrap gap-2 text-xs">
             {[
@@ -198,49 +196,30 @@ export function Dashboard() {
 
         <section className="grid gap-6 lg:grid-cols-2">
           <article className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
-            <h2 className="text-lg font-semibold text-slate-100">How it works</h2>
-            <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm leading-6 text-slate-300">
-              <li>Download or collect public urban-scene sample images.</li>
-              <li>
-                Run YOLOv8 locally once with{" "}
-                <code className="rounded bg-slate-950 px-1.5 py-0.5 text-cyan-300">
-                  scripts/generate_detections.py
-                </code>
-                .
-              </li>
-              <li>Save bounding boxes, labels, and confidence scores as JSON.</li>
-              <li>
-                Load the static files in this Next.js dashboard and render boxes
-                over each image.
-              </li>
-              <li>
-                For uploads, write the image to Firebase Storage, create a
-                Firestore job, and let Cloud Run write result artifacts.
-              </li>
-            </ol>
-            <p className="mt-4 text-sm text-slate-400">
-              All images are public, non-sensitive samples intended for portfolio
-              demonstration only.
+            <h2 className="text-lg font-semibold text-slate-100">Why I built this</h2>
+            <p className="mt-4 text-sm leading-6 text-slate-300">
+              I built this project to demonstrate an end-to-end computer vision workflow,
+              not just a static model output. The goal was to show how a user-facing web
+              app can accept an image upload, queue an inference job, process it in the
+              cloud, and return usable detection artifacts. This mirrors how production
+              AI tools are often structured: frontend interaction, secure file storage,
+              job tracking, backend inference, and downloadable results.
             </p>
           </article>
 
           <article className="rounded-xl border border-slate-800 bg-slate-900/70 p-5">
             <h2 className="text-lg font-semibold text-slate-100">
-              Limitations & future improvements
+              What this project demonstrates
             </h2>
             <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-6 text-slate-300">
-              <li>No live webcam or video inference in this MVP.</li>
-              <li>Upload jobs require Firebase project environment variables.</li>
-              <li>The YOLO/OpenCV Cloud Run service still needs to be deployed.</li>
-              <li>Sample detections are precomputed offline for stable review.</li>
-              <li>Not positioned as production-ready surveillance software.</li>
+              <li>Next.js and TypeScript frontend development</li>
+              <li>Firebase Authentication, Storage, and Firestore integration</li>
+              <li>Cloud Run FastAPI backend deployment</li>
+              <li>YOLOv8/OpenCV object detection</li>
+              <li>Asynchronous job status tracking</li>
+              <li>Annotated image, JSON, and CSV result generation</li>
+              <li>A deployable portfolio demo with both sample images and live uploads</li>
             </ul>
-            <p className="mt-4 text-sm text-slate-400">
-              Browser-side YOLO is possible with ONNX Runtime Web, but the
-              Firebase plus Cloud Run path is stronger for this portfolio demo
-              because it shows storage, async job state, service integration,
-              and downloadable artifacts.
-            </p>
           </article>
         </section>
       </main>

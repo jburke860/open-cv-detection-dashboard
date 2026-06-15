@@ -271,8 +271,7 @@ export function UploadInferencePanel() {
               Live upload inference
             </h2>
             <p className="mt-1 text-sm text-slate-400">
-              Upload one image, queue a Firebase job, then download the Cloud
-              Run detection artifacts.
+            Upload an image to run live object detection and download the annotated image, JSON results, and CSV results.
             </p>
           </div>
           <span
@@ -298,8 +297,7 @@ export function UploadInferencePanel() {
               Choose one image
             </span>
             <span className="mt-1 block text-xs text-slate-400">
-              JPG, PNG, or WebP. The selected image stays local until you start
-              the Firebase job.
+              JPG, PNG, or WebP. The image is previewed locally before detection begins.
             </span>
           </label>
 
@@ -348,14 +346,14 @@ export function UploadInferencePanel() {
 
           <div className="rounded-lg border border-slate-800 bg-slate-950/60 p-4">
             <h3 className="text-sm font-semibold text-slate-100">
-              Firebase pipeline contract
+              How this demo works
             </h3>
             <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-6 text-slate-300">
-              <li>Upload image to Firebase Cloud Storage.</li>
-              <li>Create a Firestore record in detectionJobs.</li>
-              <li>Call Cloud Run POST /jobs when an API URL is configured.</li>
-              <li>Listen for queued, running, complete, or failed status.</li>
-              <li>Download annotated image, JSON, and CSV artifacts.</li>
+              <li>Upload an image to the dashboard.</li>
+              <li>The image is stored securely in Firebase Storage.</li>
+              <li>A Firestore job is created that tracks inference status.</li>
+              <li>The image is processed with YOLOv8/OpenCV on Cloud Run.</li>
+              <li>Download the annotated image, JSON, or CSV results.</li>
             </ol>
           </div>
 
@@ -418,7 +416,7 @@ export function UploadInferencePanel() {
               disabled={!file || busy || !firebaseReady}
               className="rounded-lg border border-cyan-400 bg-cyan-400 px-3 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:border-slate-700 disabled:bg-slate-800 disabled:text-slate-500"
             >
-              {busy ? "Starting..." : "Start detection job"}
+              {busy ? "Starting..." : "Start Object Detection"}
             </button>
             <button
               type="button"
