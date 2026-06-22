@@ -22,6 +22,7 @@ import type { Detection } from "@/lib/detectionTypes";
 import { formatConfidence } from "@/lib/detectionUtils";
 
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const SLOW_START_MESSAGE_DELAY_MS = 5000;
 
 function getStatusLabel(status?: DetectionJobRecord["status"]) {
   switch (status) {
@@ -77,6 +78,7 @@ export function UploadInferencePanel() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [job, setJob] = useState<DetectionJobRecord | null>(null);
   const [busy, setBusy] = useState(false);
+  const [showSlowStartMessage, setShowSlowStartMessage] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
 
@@ -104,10 +106,25 @@ export function UploadInferencePanel() {
     };
   }, [previewUrl]);
 
+  useEffect(() => {
+    if (!busy) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setShowSlowStartMessage(true);
+    }, SLOW_START_MESSAGE_DELAY_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [busy]);
+
   function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     const nextFile = event.target.files?.[0] ?? null;
     setError(null);
     setJob(null);
+    setShowSlowStartMessage(false);
     setUploadProgress(0);
     unsubscribeRef.current?.();
     unsubscribeRef.current = null;
@@ -145,6 +162,7 @@ export function UploadInferencePanel() {
 
     setBusy(true);
     setError(null);
+    setShowSlowStartMessage(false);
     setUploadProgress(0);
     unsubscribeRef.current?.();
 
@@ -168,6 +186,7 @@ export function UploadInferencePanel() {
       );
     } finally {
       setBusy(false);
+      setShowSlowStartMessage(false);
     }
   }
 
@@ -443,6 +462,12 @@ export function UploadInferencePanel() {
               Download CSV
             </button>
           </div>
+
+          {showSlowStartMessage && (
+            <p className="text-sm text-slate-400" role="status" aria-live="polite">
+              This may take a minute.
+            </p>
+          )}
         </div>
       </div>
     </section>
