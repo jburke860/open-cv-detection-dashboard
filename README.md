@@ -321,6 +321,65 @@ After deployment, add the Cloud Run URL to the frontend environment:
 NEXT_PUBLIC_DETECTION_API_URL=https://your-cloud-run-service-url
 ```
 
+## Storage lifecycle cleanup
+
+Live uploads and generated outputs are written under:
+
+```text
+detection-jobs/{uid}/{jobId}/
+```
+
+The `storage.lifecycle.json` file configures Cloud Storage to delete objects under
+`detection-jobs/` after 1 day. Apply it from the repository root:
+
+```bash
+gcloud config set project open-cv-detection-dashboard
+
+gcloud storage buckets update gs://open-cv-detection-dashboard.firebasestorage.app \
+  --lifecycle-file=storage.lifecycle.json
+```
+
+Verify the active bucket lifecycle config:
+
+```bash
+gcloud storage buckets describe gs://open-cv-detection-dashboard.firebasestorage.app \
+  --format="default(lifecycle_config)"
+```
+
+Lifecycle changes can take up to 24 hours to take effect. If you add other bucket
+lifecycle rules later, include them in `storage.lifecycle.json` before applying it.
+
+## Firestore document cleanup
+
+New `detectionJobs` documents include an `expireAt` timestamp set 1 day after job
+creation. Enable Firestore TTL once so Firestore automatically deletes expired
+job documents:
+
+```bash
+gcloud config set project open-cv-detection-dashboard
+
+gcloud firestore fields ttls update expireAt \
+  --collection-group=detectionJobs \
+  --enable-ttl
+```
+
+Verify the TTL policy:
+
+```bash
+gcloud firestore fields ttls list --collection-group=detectionJobs
+```
+
+Deploy the Firestore security rules:
+
+```bash
+firebase deploy --only firestore:rules
+```
+
+TTL deletion is not instant; expired documents are typically deleted within 24
+hours after their expiration time. Documents without `expireAt` are not deleted
+by TTL, so old test documents created before this field existed can be deleted
+manually from the Firebase console if needed.
+
 ## Regenerating sample detections locally
 
 The built-in sample scenes use precomputed YOLOv8 detection JSON files stored in:

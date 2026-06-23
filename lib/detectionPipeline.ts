@@ -11,6 +11,7 @@ import {
   onSnapshot,
   serverTimestamp,
   setDoc,
+  Timestamp,
   updateDoc,
   type Unsubscribe,
 } from "firebase/firestore";
@@ -91,6 +92,8 @@ const requiredFirebaseConfig = [
 
 export const detectionApiUrl =
   process.env.NEXT_PUBLIC_DETECTION_API_URL?.replace(/\/$/, "") ?? "";
+
+const JOB_RETENTION_MS = 24 * 60 * 60 * 1000;
 
 let app: FirebaseApp | undefined;
 
@@ -287,6 +290,7 @@ export async function createDetectionJob({
       : "Queued. Configure NEXT_PUBLIC_DETECTION_API_URL or trigger Cloud Run from this Firestore record.",
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
+    expireAt: Timestamp.fromDate(new Date(Date.now() + JOB_RETENTION_MS)),
   });
 
   try {
