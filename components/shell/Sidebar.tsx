@@ -1,6 +1,6 @@
 "use client";
 
-import { Camera, Layers, LayoutDashboard, ScanEye } from "lucide-react";
+import { Camera, Layers, LayoutDashboard } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -27,9 +27,12 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <div className="flex h-full flex-col bg-surface-1">
       <div className="flex items-center gap-3 border-b border-line px-4 py-4">
-        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-accent-soft text-accent">
-          <ScanEye className="h-5 w-5" />
-        </span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/favicon.ico"
+          alt="OpenCV Detection logo"
+          className="h-9 w-9 rounded-xl border border-line"
+        />
         <div className="min-w-0">
           <p className="truncate text-sm font-semibold text-ink">
             OpenCV Detection

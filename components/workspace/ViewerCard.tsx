@@ -9,7 +9,6 @@ import {
   ZoomOut,
 } from "lucide-react";
 import {
-  useCallback,
   useEffect,
   useRef,
   useState,
@@ -299,6 +298,9 @@ function ViewerIconButton({
   );
 }
 
+/** Never blow small images up beyond 2× their natural size at fit zoom. */
+const MAX_FIT_UPSCALE = 2;
+
 function ViewerStage({
   result,
   visibleDetections,
@@ -322,26 +324,41 @@ function ViewerStage({
   overlayMessage?: string;
   fullscreen: boolean;
 }) {
+  const stageRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
   const draggingRef = useRef(false);
-  const [displaySize, setDisplaySize] = useState({ width: 0, height: 0 });
-
-  const updateDisplaySize = useCallback(() => {
-    const img = imageRef.current;
-    if (!img) return;
-    setDisplaySize({ width: img.clientWidth, height: img.clientHeight });
-  }, []);
+  const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
-    const img = imageRef.current;
-    if (!img) return;
+    const stage = stageRef.current;
+    if (!stage) return;
 
     // ResizeObserver fires once on observe, which covers the initial size.
-    const observer = new ResizeObserver(updateDisplaySize);
-    observer.observe(img);
+    const observer = new ResizeObserver(() => {
+      setStageSize({
+        width: stage.clientWidth,
+        height: stage.clientHeight,
+      });
+    });
+    observer.observe(stage);
     return () => observer.disconnect();
-  }, [result.key, updateDisplaySize]);
+  }, []);
+
+  // Fit the image inside the fixed-height stage (like an image viewer),
+  // then let zoom scale up from that fitted size.
+  const stagePadding = 16;
+  const fitScale =
+    stageSize.width > 0 && result.width > 0 && result.height > 0
+      ? Math.min(
+          (stageSize.width - stagePadding) / result.width,
+          (stageSize.height - stagePadding) / result.height,
+          MAX_FIT_UPSCALE
+        )
+      : 0;
+  const displaySize = {
+    width: result.width * fitScale * zoom,
+    height: result.height * fitScale * zoom,
+  };
 
   function compareFromPointer(event: ReactPointerEvent<HTMLDivElement>) {
     const rect = wrapperRef.current?.getBoundingClientRect();
@@ -354,15 +371,16 @@ function ViewerStage({
 
   return (
     <div
+      ref={stageRef}
       className={cn(
-        "relative min-h-0 flex-1 overflow-auto bg-surface-0",
-        fullscreen ? "max-h-none" : "max-h-[68vh]"
+        "relative flex min-h-0 overflow-auto bg-surface-0",
+        fullscreen ? "flex-1" : "h-[clamp(340px,58vh,680px)]"
       )}
     >
       <div
         ref={wrapperRef}
-        className="relative mx-auto"
-        style={{ width: `${zoom * 100}%` }}
+        className="relative m-auto shrink-0"
+        style={{ width: displaySize.width, height: displaySize.height }}
         onPointerDown={
           tab === "compare"
             ? (event) => {
@@ -389,11 +407,9 @@ function ViewerStage({
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          ref={imageRef}
           src={result.imageSrc}
           alt={result.title}
-          onLoad={updateDisplaySize}
-          className="block h-auto w-full select-none"
+          className="block h-full w-full select-none"
           draggable={false}
         />
 
