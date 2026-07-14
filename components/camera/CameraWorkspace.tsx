@@ -58,19 +58,30 @@ export function CameraWorkspace() {
   }
 
   function cameraErrorMessage(error: unknown): string {
-    if (error instanceof DOMException) {
-      switch (error.name) {
-        case "NotAllowedError":
-          return "Camera access was denied. Allow camera permissions for this site and try again.";
-        case "NotFoundError":
-        case "DevicesNotFoundError":
-        case "OverconstrainedError":
-          return "No camera was found on this device. Connect a webcam (or pair an iPhone via Continuity Camera) and try again.";
-        case "NotReadableError":
-          return "The camera is already in use by another app. Close it and try again.";
-      }
+    // Safari's OverconstrainedError ("Invalid constraint") is not always a
+    // DOMException instance, so match by name/message rather than type.
+    const err = error as { name?: string; message?: string } | null;
+    const name = err?.name ?? "";
+    const message = err?.message ?? "";
+
+    switch (name) {
+      case "NotAllowedError":
+      case "SecurityError":
+        return "Camera access was denied. Allow camera permissions for this site and try again.";
+      case "NotFoundError":
+      case "DevicesNotFoundError":
+      case "OverconstrainedError":
+        return "No camera was found on this device. Connect a webcam (or pair an iPhone via Continuity Camera) and try again.";
+      case "NotReadableError":
+      case "AbortError":
+        return "The camera is already in use by another app. Close it and try again.";
     }
-    return error instanceof Error ? error.message : "Failed to start the camera";
+
+    if (/constraint/i.test(message)) {
+      return "No camera was found on this device. Connect a webcam (or pair an iPhone via Continuity Camera) and try again.";
+    }
+
+    return message || "Failed to start the camera";
   }
 
   async function startCamera() {
