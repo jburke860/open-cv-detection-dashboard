@@ -37,10 +37,11 @@ export function CameraWorkspace() {
     };
   }, []);
 
-  async function startCamera() {
-    setCameraError(null);
+  async function requestCameraStream(): Promise<MediaStream> {
+    // Preferred constraints first; some browsers (notably Safari) reject
+    // these even when a camera exists, so fall back to "any camera".
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
+      return await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: "environment",
           width: { ideal: 1920 },
@@ -48,6 +49,42 @@ export function CameraWorkspace() {
         },
         audio: false,
       });
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "NotAllowedError") {
+        throw error;
+      }
+      return navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    }
+  }
+
+  function cameraErrorMessage(error: unknown): string {
+    if (error instanceof DOMException) {
+      switch (error.name) {
+        case "NotAllowedError":
+          return "Camera access was denied. Allow camera permissions for this site and try again.";
+        case "NotFoundError":
+        case "DevicesNotFoundError":
+        case "OverconstrainedError":
+          return "No camera was found on this device. Connect a webcam (or pair an iPhone via Continuity Camera) and try again.";
+        case "NotReadableError":
+          return "The camera is already in use by another app. Close it and try again.";
+      }
+    }
+    return error instanceof Error ? error.message : "Failed to start the camera";
+  }
+
+  async function startCamera() {
+    setCameraError(null);
+
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setCameraError(
+        "This browser does not support camera access (it requires a secure HTTPS connection)."
+      );
+      return;
+    }
+
+    try {
+      const stream = await requestCameraStream();
       streamRef.current = stream;
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -55,13 +92,7 @@ export function CameraWorkspace() {
       }
       setStreaming(true);
     } catch (error) {
-      setCameraError(
-        error instanceof DOMException && error.name === "NotAllowedError"
-          ? "Camera access was denied. Allow camera permissions and try again."
-          : error instanceof Error
-            ? error.message
-            : "Failed to start the camera"
-      );
+      setCameraError(cameraErrorMessage(error));
     }
   }
 
