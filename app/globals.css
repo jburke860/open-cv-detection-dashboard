@@ -1,22 +1,182 @@
 @import "tailwindcss";
 
+/*
+  Theme tokens. Dark ("command center") is the default; `.light` overrides
+  are applied by next-themes on <html>. Components use only token utilities
+  (bg-surface-*, text-ink-*, border-line, accent) so both themes stay in sync.
+*/
 :root {
-  --background: #020617;
-  --foreground: #f8fafc;
+  --surface-0: #05090f;
+  --surface-1: #0a111a;
+  --surface-2: #0f1823;
+  --surface-3: #15202e;
+  --line: rgba(148, 163, 184, 0.13);
+  --line-strong: rgba(148, 163, 184, 0.3);
+  --ink: #e6edf3;
+  --ink-muted: #8fa3b8;
+  --ink-faint: #5c6f84;
+  --accent: #2dd4bf;
+  --accent-strong: #14b8a6;
+  --accent-soft: rgba(45, 212, 191, 0.12);
+  --on-accent: #032622;
+  --success: #34d399;
+  --success-soft: rgba(52, 211, 153, 0.12);
+  --warning: #fbbf24;
+  --warning-soft: rgba(251, 191, 36, 0.12);
+  --danger: #fb7185;
+  --danger-soft: rgba(251, 113, 133, 0.12);
+  --info: #38bdf8;
+  --info-soft: rgba(56, 189, 248, 0.12);
+  --glow: rgba(45, 212, 191, 0.35);
+}
+
+.light {
+  --surface-0: #f4f7f9;
+  --surface-1: #ffffff;
+  --surface-2: #eef2f6;
+  --surface-3: #e3e9f0;
+  --line: rgba(15, 23, 42, 0.1);
+  --line-strong: rgba(15, 23, 42, 0.22);
+  --ink: #0f172a;
+  --ink-muted: #475569;
+  --ink-faint: #94a3b8;
+  --accent: #0d9488;
+  --accent-strong: #0f766e;
+  --accent-soft: rgba(13, 148, 136, 0.1);
+  --on-accent: #f0fdfa;
+  --success: #059669;
+  --success-soft: rgba(5, 150, 105, 0.1);
+  --warning: #d97706;
+  --warning-soft: rgba(217, 119, 6, 0.12);
+  --danger: #e11d48;
+  --danger-soft: rgba(225, 29, 72, 0.09);
+  --info: #0284c7;
+  --info-soft: rgba(2, 132, 199, 0.1);
+  --glow: rgba(13, 148, 136, 0.2);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-surface-0: var(--surface-0);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
+html {
+  color-scheme: dark;
+}
+
+html.light {
+  color-scheme: light;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--surface-0);
+  color: var(--ink);
 }
 
 code {
   font-family: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+/* Styled range inputs used by sliders across the app */
+input[type="range"].cv-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 9999px;
+  background: linear-gradient(
+    to right,
+    var(--accent) 0%,
+    var(--accent) var(--slider-progress, 50%),
+    var(--surface-3) var(--slider-progress, 50%),
+    var(--surface-3) 100%
+  );
+  outline: none;
+}
+
+input[type="range"].cv-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: var(--accent);
+  border: 3px solid var(--surface-1);
+  box-shadow: 0 0 0 1px var(--line-strong), 0 0 12px var(--glow);
+  cursor: pointer;
+}
+
+input[type="range"].cv-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: var(--accent);
+  border: 3px solid var(--surface-1);
+  box-shadow: 0 0 0 1px var(--line-strong), 0 0 12px var(--glow);
+  cursor: pointer;
+}
+
+input[type="range"].cv-slider:disabled::-webkit-slider-thumb {
+  background: var(--ink-faint);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+@keyframes cv-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cv-fade-up {
+  animation: cv-fade-up 0.35s ease-out both;
+}
+
+@keyframes cv-pulse-dot {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--glow);
+  }
+  50% {
+    box-shadow: 0 0 0 4px transparent;
+  }
+}
+
+.cv-pulse-dot {
+  animation: cv-pulse-dot 2s ease-in-out infinite;
 }

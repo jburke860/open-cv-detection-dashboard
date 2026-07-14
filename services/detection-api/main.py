@@ -10,8 +10,9 @@ from typing import Optional
 
 import cv2
 import firebase_admin
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from firebase_admin import auth as firebase_auth
 from firebase_admin import firestore, storage
 from pydantic import BaseModel
 from ultralytics import YOLO
@@ -22,7 +23,16 @@ STORAGE_BUCKET = os.environ.get(
     "FIREBASE_STORAGE_BUCKET",
     "open-cv-detection-dashboard.firebasestorage.app",
 )
-MODEL_NAME = os.environ.get("YOLO_MODEL", "yolov8n.pt")
+
+DEFAULT_MODEL = "yolov8n"
+MODEL_FILES = {
+    "yolov8n": os.environ.get("YOLO_MODEL_N", "yolov8n.pt"),
+    "yolov8s": os.environ.get("YOLO_MODEL_S", "yolov8s.pt"),
+}
+MODEL_LABELS = {
+    "yolov8n": "YOLOv8n",
+    "yolov8s": "YOLOv8s",
+}
 
 if not firebase_admin._apps:
     firebase_admin.initialize_app(
@@ -34,7 +44,19 @@ if not firebase_admin._apps:
 
 db = firestore.client()
 bucket = storage.bucket()
-model = YOLO(MODEL_NAME)
+
+_models: dict[str, YOLO] = {}
+
+
+def get_model(key: str) -> YOLO:
+    if key not in _models:
+        _models[key] = YOLO(MODEL_FILES[key])
+    return _models[key]
+
+
+# Eagerly load the default model so the first request after a cold start
+# only pays for inference, not model initialization.
+get_model(DEFAULT_MODEL)
 
 app = FastAPI(title="Open CV Detection API")
 
@@ -53,10 +75,10 @@ app.add_middleware(
 
 class JobRequest(BaseModel):
     jobId: str
-    inputPath: str
-    outputPrefix: str
-    confidenceThreshold: Optional[float] = 0.25
-    originalName: Optional[str] = None
+
+
+def clamp(value: float, low: float, high: float) -> float:
+    return max(low, min(value, high))
 
 
 def update_job(job_id: str, data: dict) -> None:
@@ -111,10 +133,34 @@ def get_input_suffix(original_name: Optional[str], input_path: str) -> str:
     return suffix
 
 
-def run_detection(input_path: str, annotated_path: str, confidence: float) -> dict:
+def verify_caller(authorization: Optional[str]) -> str:
+    """Verify the Firebase ID token and return the caller's uid."""
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing bearer token")
+
+    token = authorization.split(" ", 1)[1]
+    try:
+        decoded = firebase_auth.verify_id_token(token)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid auth token")
+
+    return decoded["uid"]
+
+
+def run_detection(
+    model_key: str,
+    input_path: str,
+    annotated_path: str,
+    confidence: float,
+    iou: float,
+    max_detections: int,
+) -> dict:
+    model = get_model(model_key)
     results = model.predict(
         source=input_path,
         conf=confidence,
+        iou=iou,
+        max_det=max_detections,
         verbose=False,
     )[0]
 
@@ -147,26 +193,55 @@ def run_detection(input_path: str, annotated_path: str, confidence: float) -> di
     return {
         "width": width,
         "height": height,
-        "model": "YOLOv8n",
+        "model": MODEL_LABELS[model_key],
         "detections": detections,
     }
 
 
 @app.get("/health")
 def health():
-    return {"ok": True}
+    return {"ok": True, "models": sorted(MODEL_FILES)}
 
 
 @app.post("/jobs")
-def process_job(req: JobRequest):
+def process_job(req: JobRequest, authorization: Optional[str] = Header(None)):
+    uid = verify_caller(authorization)
+
     job_ref = db.collection("detectionJobs").document(req.jobId)
     job_doc = job_ref.get()
 
     if not job_doc.exists:
         raise HTTPException(status_code=404, detail="Firestore job not found")
 
-    confidence = req.confidenceThreshold or 0.25
-    confidence = max(0.01, min(confidence, 0.99))
+    # All job parameters come from the Firestore document (created under
+    # Firestore security rules), never from the request body — the caller
+    # only proves ownership.
+    job = job_doc.to_dict() or {}
+
+    if job.get("ownerId") != uid:
+        raise HTTPException(status_code=403, detail="Not your job")
+
+    job_input = job.get("input") or {}
+    input_path = job_input.get("storagePath")
+    original_name = job_input.get("originalName")
+    output_prefix = job.get("outputPrefix")
+
+    owned_prefix = f"detection-jobs/{uid}/"
+    if (
+        not input_path
+        or not output_prefix
+        or not str(input_path).startswith(owned_prefix)
+        or not str(output_prefix).startswith(owned_prefix)
+    ):
+        raise HTTPException(status_code=400, detail="Job has invalid storage paths")
+
+    model_key = job.get("model") or DEFAULT_MODEL
+    if model_key not in MODEL_FILES:
+        raise HTTPException(status_code=400, detail=f"Unknown model: {model_key}")
+
+    confidence = clamp(float(job.get("confidenceThreshold") or 0.25), 0.01, 0.99)
+    iou = clamp(float(job.get("iouThreshold") or 0.45), 0.05, 0.95)
+    max_detections = int(clamp(float(job.get("maxDetections") or 100), 1, 300))
 
     update_job(
         req.jobId,
@@ -181,28 +256,37 @@ def process_job(req: JobRequest):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp = Path(tmpdir)
 
-            suffix = get_input_suffix(req.originalName, req.inputPath)
+            suffix = get_input_suffix(original_name, input_path)
 
             input_file = str(tmp / f"input{suffix}")
             annotated_file = str(tmp / "annotated.png")
             json_file = str(tmp / "detections.json")
             csv_file = str(tmp / "detections.csv")
 
-            download_blob(req.inputPath, input_file)
+            download_blob(input_path, input_file)
 
             start = time.time()
-            result_payload = run_detection(input_file, annotated_file, confidence)
+            result_payload = run_detection(
+                model_key,
+                input_file,
+                annotated_file,
+                confidence,
+                iou,
+                max_detections,
+            )
             runtime_ms = int((time.time() - start) * 1000)
 
-            annotated_storage_path = f"{req.outputPrefix}/annotated.png"
-            json_storage_path = f"{req.outputPrefix}/detections.json"
-            csv_storage_path = f"{req.outputPrefix}/detections.csv"
+            annotated_storage_path = f"{output_prefix}/annotated.png"
+            json_storage_path = f"{output_prefix}/detections.json"
+            csv_storage_path = f"{output_prefix}/detections.csv"
 
             json_payload = {
                 "jobId": req.jobId,
-                "inputPath": req.inputPath,
-                "originalName": req.originalName,
+                "inputPath": input_path,
+                "originalName": original_name,
                 "confidenceThreshold": confidence,
+                "iouThreshold": iou,
+                "maxDetections": max_detections,
                 "runtimeMs": runtime_ms,
                 **result_payload,
             }
@@ -225,8 +309,11 @@ def process_job(req: JobRequest):
                         "csvPath": csv_storage_path,
                         "width": result_payload["width"],
                         "height": result_payload["height"],
+                        "model": result_payload["model"],
                         "detections": result_payload["detections"],
                         "runtimeMs": runtime_ms,
+                        "iouThreshold": iou,
+                        "maxDetections": max_detections,
                     },
                 },
             )
@@ -235,6 +322,7 @@ def process_job(req: JobRequest):
                 "ok": True,
                 "jobId": req.jobId,
                 "status": "complete",
+                "model": result_payload["model"],
                 "detections": len(result_payload["detections"]),
             }
 

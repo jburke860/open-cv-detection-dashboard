@@ -27,6 +27,31 @@ import type { Detection } from "@/lib/detectionTypes";
 export type DetectionJobStatus = "queued" | "running" | "complete" | "failed";
 export type DetectionArtifactKind = "annotatedImage" | "json" | "csv";
 
+export type DetectionModelId = "yolov8n" | "yolov8s";
+
+export const DETECTION_MODELS: Array<{
+  id: DetectionModelId;
+  label: string;
+  hint: string;
+}> = [
+  { id: "yolov8n", label: "YOLOv8n", hint: "Fast · recommended" },
+  { id: "yolov8s", label: "YOLOv8s", hint: "Balanced · more accurate" },
+];
+
+export interface InferenceOptions {
+  confidenceThreshold: number;
+  model: DetectionModelId;
+  iouThreshold: number;
+  maxDetections: number;
+}
+
+export const DEFAULT_INFERENCE_OPTIONS: InferenceOptions = {
+  confidenceThreshold: 0.25,
+  model: "yolov8n",
+  iouThreshold: 0.45,
+  maxDetections: 100,
+};
+
 export interface DetectionJobResult {
   annotatedImagePath?: string;
   annotatedImageUrl?: string;
@@ -37,6 +62,8 @@ export interface DetectionJobResult {
   detections?: Detection[];
   width?: number;
   height?: number;
+  runtimeMs?: number;
+  model?: string;
 }
 
 export interface DetectionJobRecord {
@@ -52,9 +79,8 @@ export interface DetectionJobRecord {
   result?: DetectionJobResult;
 }
 
-interface CreateDetectionJobOptions {
+interface CreateDetectionJobOptions extends InferenceOptions {
   file: File;
-  confidenceThreshold: number;
   onUploadProgress?: (progress: number) => void;
 }
 
@@ -209,17 +235,13 @@ function normalizeJob(id: string, value: unknown): DetectionJobRecord {
         asDetections(result.detections) ?? asDetections(data.detections),
       width: asNumber(result.width) ?? asNumber(data.width),
       height: asNumber(result.height) ?? asNumber(data.height),
+      runtimeMs: asNumber(result.runtimeMs),
+      model: asString(result.model),
     },
   };
 }
 
-async function callDetectionService(payload: {
-  jobId: string;
-  inputPath: string;
-  outputPrefix: string;
-  confidenceThreshold: number;
-  originalName: string;
-}) {
+async function callDetectionService(jobId: string, idToken: string) {
   if (!isDetectionApiConfigured()) {
     return;
   }
@@ -228,8 +250,11 @@ async function callDetectionService(payload: {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${idToken}`,
     },
-    body: JSON.stringify(payload),
+    // The service reads all job parameters from the Firestore document;
+    // the request only identifies the job and proves ownership.
+    body: JSON.stringify({ jobId }),
   });
 
   if (!response.ok) {
@@ -240,6 +265,9 @@ async function callDetectionService(payload: {
 export async function createDetectionJob({
   file,
   confidenceThreshold,
+  model,
+  iouThreshold,
+  maxDetections,
   onUploadProgress,
 }: CreateDetectionJobOptions) {
   const user = await ensureAnonymousUser();
@@ -277,6 +305,9 @@ export async function createDetectionJob({
   await setDoc(jobRef, {
     status: "queued",
     confidenceThreshold,
+    model,
+    iouThreshold,
+    maxDetections,
     ownerId: user.uid,
     input: {
       storagePath: inputPath,
@@ -294,13 +325,8 @@ export async function createDetectionJob({
   });
 
   try {
-    await callDetectionService({
-      jobId,
-      inputPath,
-      outputPrefix,
-      confidenceThreshold,
-      originalName: file.name,
-    });
+    const idToken = await user.getIdToken();
+    await callDetectionService(jobId, idToken);
   } catch (error) {
     await updateDoc(jobRef, {
       status: "failed",

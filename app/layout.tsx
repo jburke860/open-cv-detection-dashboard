@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+import { AppShell } from "@/components/shell/AppShell";
+import { ThemeProvider } from "@/components/shell/ThemeProvider";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -13,9 +16,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Open CV Detection Dashboard",
+  title: "OpenCV Detection Dashboard",
   description:
-    "Firebase-ready OpenCV dashboard for image upload jobs, YOLO detection results, and annotated artifact downloads.",
+    "Upload an image or pick a sample scene, run live YOLOv8 object detection through a Firebase + Cloud Run pipeline, and export annotated results.",
 };
 
 export default function RootLayout({
@@ -26,9 +29,14 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full font-sans">{children}</body>
+      <body className="min-h-full font-sans">
+        <ThemeProvider>
+          <AppShell>{children}</AppShell>
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

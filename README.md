@@ -2,96 +2,111 @@
 
 Made by Jeremy Burke.
 
-A hosted computer vision demo that lets users upload an image or select a built-in sample scene, run YOLOv8 object detection, and download the results as an annotated image, JSON file, or CSV file.
+A hosted computer vision demo that lets users upload an image, capture a webcam frame, or batch-process multiple images, run YOLOv8 object detection, and explore the results in an interactive workspace — with annotated image, JSON, and CSV exports.
 
-The project demonstrates a full image-inference workflow: a Next.js/TypeScript frontend, Firebase Authentication, Firebase Storage, Firestore job tracking, and a Cloud Run FastAPI backend that runs YOLOv8/OpenCV inference.
+The project demonstrates a full image-inference workflow: a Next.js/TypeScript frontend with a dark/light themed dashboard UI, Firebase Authentication, Firebase Storage, Firestore job tracking, and a Cloud Run FastAPI backend that runs YOLOv8/OpenCV inference.
 
 ## Live demo
 
 [View the deployed dashboard](https://open-cv-detection-dashboard--open-cv-detection-dashboard.us-central1.hosted.app)
 
-
 ## What it does
 
-The dashboard supports two review paths:
+The dashboard has three detection surfaces, all rendered through one unified result workspace:
 
-1. **Live upload inference**  
-   Users upload a JPG, PNG, or WebP image. The app stores the image, creates an inference job, sends the job to a Cloud Run backend, runs YOLOv8 object detection, and returns downloadable detection outputs.
+1. **Detection workspace (live upload + samples)**
+   Upload a JPG, PNG, or WebP image, pick a model, tune the confidence threshold, NMS IoU, and max detections, and run live inference on Cloud Run. Or select one of the built-in urban sample scenes with precomputed YOLOv8 detections.
 
-2. **Built-in sample image review**  
-   Users can select public urban-scene sample images with precomputed YOLOv8 detections. The dashboard visualizes bounding boxes, labels, confidence scores, class counts, and detection tables directly in the browser.
+2. **Batch processing**
+   Queue multiple images and run them through the pipeline with limited concurrency. Each item reports upload, processing, and completion state, and the page aggregates detection totals across the batch.
 
-The demo uses `yolov8n.pt`, a lightweight pretrained YOLOv8 model weights file. It is optimized for fast detection of common object classes such as people, cars, bicycles, motorcycles, buses, trucks, and other everyday scene objects. The pipeline can be adapted later to use custom-trained `.pt` weights for domain-specific detection.
+3. **Live camera**
+   Start the webcam, capture a single frame, and send it through the same detection pipeline. The live feed never leaves the device — only captured frames are uploaded.
+
+Every result opens in the same explorer: Original / Annotated / Compare / Data viewer tabs, zoom and fullscreen, class filter chips, a searchable and sortable detections panel with a per-detection inspector, real computed analytics (class frequency, confidence histogram, confidence bands), rule-based insights, and client-side exports that reflect the current filters.
+
+The demo uses `yolov8n.pt` and `yolov8s.pt`, pretrained YOLOv8 weights optimized for common object classes such as people, cars, bicycles, motorcycles, buses, trucks, and other everyday scene objects.
 
 ## Screenshots
 
-### Live upload inference
+### Detection workspace (dark theme)
 
-![Live upload complete](images/readme-screenshots/live-upload-complete.png)
+![Detection workspace, dark theme](images/readme-screenshots/dashboard-dark.png)
 
-### Annotated detection output
+### Detection workspace (light theme)
 
-![Annotated detection output](images/readme-screenshots/annotated-output.png)
+![Detection workspace, light theme](images/readme-screenshots/dashboard-light.png)
 
-### Detection results table
+### Batch processing
 
-![Detection results table](images/readme-screenshots/detection-results.png)
+![Batch processing](images/readme-screenshots/batch-processing.png)
+
+### Live camera
+
+![Live camera](images/readme-screenshots/live-camera.png)
 
 ## Key features
 
-- Hosted Next.js/TypeScript dashboard
-- Live image upload workflow
-- Firebase anonymous authentication
-- Firebase Storage image upload
-- Firestore inference job tracking
-- Cloud Run FastAPI backend
-- YOLOv8/OpenCV object detection
-- Annotated image generation
-- JSON detection output
-- CSV detection output
-- Downloadable result files
-- Built-in public sample image gallery
-- Precomputed sample detections for fast review
-- Bounding-box overlays scaled to the rendered image size
-- Confidence threshold filtering
-- Detected-object sidebar
-- Summary cards for total detections, unique classes, highest confidence, and average confidence
-- Detection results table with label, confidence, and source-image coordinates
+- Hosted Next.js/TypeScript dashboard with sidebar navigation
+- Dark "command center" theme with a full light theme toggle
+- Model picker (YOLOv8n fast / YOLOv8s balanced)
+- Confidence threshold, NMS IoU threshold, and max-detections controls passed to real inference
+- Live image upload workflow with drag & drop
+- Batch upload queue with limited concurrency and aggregate stats
+- Webcam single-frame capture through the same pipeline
+- Unified client-side viewer: Original / Annotated / Compare slider / raw Data tabs
+- Zoom, fullscreen, class filter chips, and hover-synced bounding boxes
+- Searchable, sortable detections panel with per-detection inspector
+- Real computed analytics: class frequency, confidence histogram, confidence bands
+- Rule-based insights derived from the detections in view
+- Annotated image, JSON, and CSV exports reflecting the current filters
+- Raw Cloud Run artifacts (annotated.png, detections.json, detections.csv) downloadable for uploads
+- Live system status (Cloud Run health check + Firebase config) in the sidebar
+- Firebase anonymous authentication with ID-token-verified backend calls
+- Firestore inference job tracking with TTL cleanup
+- One-day storage lifecycle cleanup for uploads and outputs
 
 ## Architecture
 
 ### Live upload inference
 
 ```text
-User uploads image
+User uploads image (workspace, batch, or camera)
         |
         v
 Next.js / TypeScript frontend
         |
         v
-Firebase Authentication
+Firebase anonymous authentication
         |
         v
-Firebase Storage stores input image
+Firebase Storage stores input image under detection-jobs/{uid}/{jobId}/input/
         |
         v
-Firestore creates detection job
+Firestore job document created with all inference parameters
+(model, confidence, IoU, max detections)
         |
         v
-Cloud Run FastAPI service receives job
+Frontend calls Cloud Run POST /jobs with { jobId } + Firebase ID token
         |
         v
-YOLOv8 / OpenCV runs object detection
+Cloud Run verifies the token, loads the job document, and checks that
+the caller owns the job and its storage paths
         |
         v
-Cloud Run writes annotated image, JSON, and CSV
+YOLOv8 / OpenCV inference (yolov8n or yolov8s)
         |
         v
-Firebase Storage + Firestore update result status
+Cloud Run writes annotated image, JSON, and CSV to Storage
         |
         v
-User downloads detection outputs from dashboard
+Firestore job updated with results; the dashboard listens in real time
+        |
+        v
+User explores results and downloads detection outputs
 ```
+
+The Cloud Run service never trusts request-body parameters: everything except the job ID comes from the Firestore document, which is created under Firestore security rules, and the caller must present a Firebase ID token matching the job's `ownerId`.
 
 ### Sample image review
 
@@ -105,10 +120,8 @@ Precomputed YOLOv8 JSON detections
 Next.js dashboard
         |
         v
-Browser visualization
-        |
-        v
-Bounding boxes, labels, confidence scores, summaries, and table output
+Same client-side viewer as live uploads
+(bounding boxes, filters, analytics, exports)
 ```
 
 ## Tech stack
@@ -119,6 +132,9 @@ Bounding boxes, labels, confidence scores, summaries, and table output
 - TypeScript
 - React
 - Tailwind CSS
+- next-themes (dark/light theming)
+- Recharts (analytics charts)
+- lucide-react (icons)
 
 ### Backend and cloud
 
@@ -132,7 +148,7 @@ Bounding boxes, labels, confidence scores, summaries, and table output
 
 ### Computer vision
 
-- YOLOv8n
+- YOLOv8n and YOLOv8s
 - Ultralytics
 - OpenCV
 
@@ -148,24 +164,28 @@ Bounding boxes, labels, confidence scores, summaries, and table output
 open-cv-detection-dashboard/
 ├── app/
 │   ├── layout.tsx
-│   ├── page.tsx
-│   └── globals.css
+│   ├── page.tsx            # detection workspace
+│   ├── batch/page.tsx      # batch processing
+│   ├── camera/page.tsx     # live camera capture
+│   └── globals.css         # theme tokens (dark + light)
 ├── components/
-│   ├── Dashboard.tsx
-│   ├── UploadInferencePanel.tsx
-│   ├── DetectionControls.tsx
-│   ├── DetectionViewer.tsx
-│   ├── DetectionSummaryCards.tsx
-│   ├── DetectionTable.tsx
-│   └── ImageSelector.tsx
+│   ├── shell/              # sidebar, topbar, theme toggle, system status
+│   ├── ui/                 # Card, Button, Badge, Slider, Tabs, Select, ...
+│   ├── workspace/          # viewer, panels, upload controls, hero
+│   ├── batch/              # batch queue workspace
+│   └── camera/             # camera capture workspace
 ├── lib/
-│   ├── detectionArtifacts.ts
-│   ├── detectionPipeline.ts
+│   ├── detectionPipeline.ts    # Firebase + Cloud Run client pipeline
+│   ├── useDetectionJobRunner.ts
+│   ├── useBatchQueue.ts
+│   ├── useSystemStatus.ts
+│   ├── detectionArtifacts.ts   # client-side exports
 │   ├── detectionTypes.ts
-│   └── detectionUtils.ts
+│   ├── detectionUtils.ts
+│   └── workspaceTypes.ts
 ├── public/
-│   ├── images/
-│   └── detections/
+│   ├── images/             # sample scenes
+│   └── detections/         # precomputed sample detections
 ├── scripts/
 │   ├── generate_detections.py
 │   └── requirements.txt
@@ -254,7 +274,8 @@ Expected response:
 
 ```json
 {
-  "ok": true
+  "ok": true,
+  "models": ["yolov8n", "yolov8s"]
 }
 ```
 
@@ -263,23 +284,20 @@ The frontend sends detection jobs to:
 ```http
 POST /jobs
 Content-Type: application/json
+Authorization: Bearer <firebase-id-token>
 ```
 
-Example request body:
+Request body:
 
 ```json
 {
-  "jobId": "firestore-job-id",
-  "inputPath": "detection-jobs/{uid}/{jobId}/input/image.jpg",
-  "outputPrefix": "detection-jobs/{uid}/{jobId}/output",
-  "confidenceThreshold": 0.25,
-  "originalName": "image.jpg"
+  "jobId": "firestore-job-id"
 }
 ```
 
-The backend downloads the image from Firebase Storage, runs YOLOv8/OpenCV inference, writes output files, and updates the Firestore job record.
+All inference parameters — model, confidence threshold, NMS IoU threshold, max detections, input path, and output prefix — are read from the Firestore job document, never from the request body. The service verifies the Firebase ID token and rejects the request unless the token's `uid` matches the job's `ownerId` and the job's storage paths live under `detection-jobs/{uid}/`.
 
-Example result structure:
+Example result structure written back to Firestore:
 
 ```json
 {
@@ -290,13 +308,18 @@ Example result structure:
     "csvPath": "detection-jobs/{uid}/{jobId}/output/detections.csv",
     "width": 1280,
     "height": 720,
+    "model": "YOLOv8n",
     "detections": [],
-    "runtimeMs": 9880
+    "runtimeMs": 9880,
+    "iouThreshold": 0.45,
+    "maxDetections": 100
   }
 }
 ```
 
 ## Deploying the detection API
+
+Both model weights are baked into the Docker image at build time, so cold starts never download them.
 
 From the repository root:
 
@@ -312,7 +335,7 @@ gcloud run deploy detection-api \
   --timeout 900 \
   --min-instances 0 \
   --max-instances 1 \
-  --set-env-vars FIREBASE_PROJECT_ID=open-cv-detection-dashboard,FIREBASE_STORAGE_BUCKET=open-cv-detection-dashboard.firebasestorage.app,YOLO_MODEL=yolov8n.pt
+  --set-env-vars FIREBASE_PROJECT_ID=open-cv-detection-dashboard,FIREBASE_STORAGE_BUCKET=open-cv-detection-dashboard.firebasestorage.app
 ```
 
 After deployment, add the Cloud Run URL to the frontend environment:
@@ -421,88 +444,14 @@ Each detection file contains image metadata and object-detection results.
   "width": 1280,
   "height": 853,
   "model": "YOLOv8n",
+  "generatedBy": "scripts/generate_detections.py",
   "detections": [
     {
       "id": 1,
       "label": "car",
-      "confidence": 0.87,
-      "box": {
-        "x": 420,
-        "y": 180,
-        "width": 120,
-        "height": 340
-      }
+      "confidence": 0.93,
+      "box": { "x": 117, "y": 620, "width": 176, "height": 203 }
     }
   ]
 }
 ```
-
-Bounding-box coordinates use source-image pixels. The dashboard scales each box to match the rendered image size in the browser.
-
-## Environment variables
-
-Frontend variables:
-
-```text
-NEXT_PUBLIC_FIREBASE_API_KEY=
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
-NEXT_PUBLIC_FIREBASE_APP_ID=
-NEXT_PUBLIC_DETECTION_API_URL=
-```
-
-Cloud Run backend variables:
-
-```text
-FIREBASE_PROJECT_ID=
-FIREBASE_STORAGE_BUCKET=
-YOLO_MODEL=yolov8n.pt
-```
-
-Do not commit `.env.local` or private credentials.
-
-## Build checks
-
-Run these before pushing frontend changes:
-
-```bash
-npm run lint
-npm run build
-```
-
-## Current scope
-
-This project is a portfolio demo for cloud-based computer vision inference and result visualization.
-
-Included:
-
-- Live one-image upload inference
-- Firebase-backed job creation and status tracking
-- Cloud Run YOLOv8/OpenCV backend
-- Annotated image, JSON, and CSV result downloads
-- Public sample image review
-- Browser-based bounding-box visualization
-
-Not included:
-
-- Live webcam inference
-- Video-stream inference
-- Custom-trained model weights
-- Production user accounts
-- Production monitoring or alerting
-- Private or sensitive image workflows
-
-## Future improvements
-
-Potential extensions include:
-
-- Custom-trained YOLO `.pt` model support
-- Class-based filtering
-- Job retry and cancellation
-- Side-by-side model comparison
-- Larger public sample image set
-- Video or webcam inference
-- Admin dashboard for reviewing job history
-- Browser-side inference option using ONNX Runtime Web
