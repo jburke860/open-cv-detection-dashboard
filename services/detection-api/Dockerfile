@@ -5,13 +5,18 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     libglib2.0-0 \
     libgl1 \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Bake model weights into the image so cold starts never download them.
-RUN python -c "from ultralytics import YOLO; YOLO('yolov8n.pt'); YOLO('yolov8s.pt')"
+RUN python -c "from ultralytics import RTDETR, YOLO; [YOLO(f) for f in ['yolov8n.pt', 'yolov8s.pt', 'yolo11n.pt', 'yolo11s.pt', 'yolo12n.pt']]; RTDETR('rtdetr-l.pt')"
+
+# YOLO-World needs the CLIP text encoder for custom vocabularies; running
+# set_classes once at build time installs and caches it inside the image.
+RUN python -c "from ultralytics import YOLO; m = YOLO('yolov8s-worldv2.pt'); m.set_classes(['person'])"
 
 COPY main.py .
 

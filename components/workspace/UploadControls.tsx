@@ -177,6 +177,34 @@ export function UploadControls({
             </Select>
           </div>
 
+          {selectedModel.world ? (
+            <div>
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="class-prompt"
+                  className="w-24 shrink-0 text-xs font-medium text-ink-muted"
+                >
+                  Classes
+                </label>
+                <input
+                  id="class-prompt"
+                  type="text"
+                  value={settings.classPrompt}
+                  onChange={(event) =>
+                    update({ classPrompt: event.target.value })
+                  }
+                  placeholder="e.g. person, dog, red umbrella"
+                  className="min-w-0 flex-1 rounded-lg border border-line bg-surface-2 px-2.5 py-1.5 text-xs text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none"
+                />
+              </div>
+              <p className="mt-1 pl-26 text-[11px] leading-4 text-ink-faint">
+                Comma-separated, free-form. Leave empty for the 80 standard
+                classes; unusual prompts often need a lower confidence
+                threshold.
+              </p>
+            </div>
+          ) : null}
+
           <div>
             <div className="flex items-center justify-between gap-2">
               <label
@@ -258,12 +286,14 @@ export function UploadControls({
               max={0.9}
               step={0.05}
               value={settings.iouThreshold}
+              disabled={selectedModel.noNms}
               onChange={(value) => update({ iouThreshold: value })}
               className="mt-2"
             />
             <p className="mt-1.5 text-[11px] leading-4 text-ink-faint">
-              Lower values merge overlapping boxes more aggressively during
-              non-maximum suppression.
+              {selectedModel.noNms
+                ? `${selectedModel.label} is NMS-free — this setting has no effect.`
+                : "Lower values merge overlapping boxes more aggressively during non-maximum suppression."}
             </p>
           </div>
           <div>

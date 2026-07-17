@@ -5,6 +5,7 @@ import { Select } from "@/components/ui/Select";
 import { Slider } from "@/components/ui/Slider";
 import {
   DETECTION_MODELS,
+  getModelInfo,
   type DetectionModelId,
   type InferenceOptions,
 } from "@/lib/detectionPipeline";
@@ -20,6 +21,8 @@ export function InferenceSettingsFields({
   onChange: (settings: InferenceOptions) => void;
   disabled?: boolean;
 }) {
+  const modelInfo = getModelInfo(settings.model);
+
   function update(partial: Partial<InferenceOptions>) {
     onChange({ ...settings, ...partial });
   }
@@ -90,10 +93,15 @@ export function InferenceSettingsFields({
           max={0.9}
           step={0.05}
           value={settings.iouThreshold}
-          disabled={disabled}
+          disabled={disabled || modelInfo.noNms}
           onChange={(value) => update({ iouThreshold: value })}
           className="mt-3"
         />
+        {modelInfo.noNms ? (
+          <p className="mt-1.5 text-[11px] leading-4 text-ink-faint">
+            {modelInfo.label} is NMS-free — this setting has no effect.
+          </p>
+        ) : null}
       </div>
 
       <div>
@@ -119,6 +127,30 @@ export function InferenceSettingsFields({
           className="mt-3"
         />
       </div>
+
+      {modelInfo.world ? (
+        <div className="sm:col-span-2 xl:col-span-4">
+          <label
+            htmlFor="settings-class-prompt"
+            className="text-xs font-medium text-ink-muted"
+          >
+            Classes to detect
+          </label>
+          <input
+            id="settings-class-prompt"
+            type="text"
+            value={settings.classPrompt}
+            disabled={disabled}
+            onChange={(event) => update({ classPrompt: event.target.value })}
+            placeholder="e.g. person, dog, red umbrella"
+            className="mt-2 w-full rounded-lg border border-line bg-surface-2 px-2.5 py-1.5 text-xs text-ink placeholder:text-ink-faint focus:border-accent focus:outline-none disabled:opacity-50"
+          />
+          <p className="mt-1 text-[11px] leading-4 text-ink-faint">
+            Comma-separated, free-form. Leave empty for the 80 standard
+            classes; unusual prompts often need a lower confidence threshold.
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }

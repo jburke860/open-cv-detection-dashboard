@@ -3,7 +3,9 @@ from __future__ import annotations
 import csv
 import json
 import os
+import re
 import tempfile
+import threading
 import time
 from pathlib import Path
 from typing import Optional
@@ -15,7 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from firebase_admin import auth as firebase_auth
 from firebase_admin import firestore, storage
 from pydantic import BaseModel
-from ultralytics import YOLO
+from ultralytics import RTDETR, YOLO
 
 
 PROJECT_ID = os.environ.get("FIREBASE_PROJECT_ID", "open-cv-detection-dashboard")
@@ -25,14 +27,25 @@ STORAGE_BUCKET = os.environ.get(
 )
 
 DEFAULT_MODEL = "yolov8n"
-MODEL_FILES = {
-    "yolov8n": os.environ.get("YOLO_MODEL_N", "yolov8n.pt"),
-    "yolov8s": os.environ.get("YOLO_MODEL_S", "yolov8s.pt"),
+
+# All weight files are baked into the Docker image (see Dockerfile), so
+# lazy-loading a model never hits the network.
+MODEL_SPECS: dict[str, dict] = {
+    "yolov8n": {"file": "yolov8n.pt", "label": "YOLOv8n"},
+    "yolov8s": {"file": "yolov8s.pt", "label": "YOLOv8s"},
+    "yolo11n": {"file": "yolo11n.pt", "label": "YOLO11n"},
+    "yolo11s": {"file": "yolo11s.pt", "label": "YOLO11s"},
+    "yolo12n": {"file": "yolo12n.pt", "label": "YOLO12n"},
+    "rtdetr-l": {"file": "rtdetr-l.pt", "label": "RT-DETR-L", "arch": "rtdetr"},
+    "yolov8s-world": {
+        "file": "yolov8s-worldv2.pt",
+        "label": "YOLOv8s-World",
+        "world": True,
+    },
 }
-MODEL_LABELS = {
-    "yolov8n": "YOLOv8n",
-    "yolov8s": "YOLOv8s",
-}
+
+MAX_PROMPT_CLASSES = 20
+MAX_PROMPT_CLASS_LENGTH = 40
 
 if not firebase_admin._apps:
     firebase_admin.initialize_app(
@@ -46,11 +59,21 @@ db = firestore.client()
 bucket = storage.bucket()
 
 _models: dict[str, YOLO] = {}
+_default_world_names: dict[str, list[str]] = {}
+_world_classes: dict[str, Optional[list[str]]] = {}
+# Models are mutable (set_classes) and inference is CPU-bound anyway, so
+# serialize access instead of racing FastAPI's threadpool.
+_inference_lock = threading.Lock()
 
 
 def get_model(key: str) -> YOLO:
     if key not in _models:
-        _models[key] = YOLO(MODEL_FILES[key])
+        spec = MODEL_SPECS[key]
+        loader = RTDETR if spec.get("arch") == "rtdetr" else YOLO
+        _models[key] = loader(spec["file"])
+        if spec.get("world"):
+            _default_world_names[key] = list(_models[key].names.values())
+            _world_classes[key] = None
     return _models[key]
 
 
@@ -79,6 +102,21 @@ class JobRequest(BaseModel):
 
 def clamp(value: float, low: float, high: float) -> float:
     return max(low, min(value, high))
+
+
+def parse_class_prompt(raw: object) -> list[str]:
+    """Sanitize the open-vocabulary class prompt from the job document."""
+    if not isinstance(raw, str):
+        return []
+
+    classes: list[str] = []
+    for part in raw.split(","):
+        name = re.sub(r"[^a-zA-Z0-9 '\-]", "", part).strip().lower()
+        name = name[:MAX_PROMPT_CLASS_LENGTH]
+        if name and name not in classes:
+            classes.append(name)
+
+    return classes[:MAX_PROMPT_CLASSES]
 
 
 def update_job(job_id: str, data: dict) -> None:
@@ -154,15 +192,27 @@ def run_detection(
     confidence: float,
     iou: float,
     max_detections: int,
+    prompt_classes: list[str],
 ) -> dict:
     model = get_model(model_key)
-    results = model.predict(
-        source=input_path,
-        conf=confidence,
-        iou=iou,
-        max_det=max_detections,
-        verbose=False,
-    )[0]
+    spec = MODEL_SPECS[model_key]
+
+    with _inference_lock:
+        if spec.get("world"):
+            # set_classes mutates the cached model; only re-embed the text
+            # prompt when it actually changed since the previous job.
+            wanted = prompt_classes or None
+            if _world_classes.get(model_key) != wanted:
+                model.set_classes(wanted or _default_world_names[model_key])
+                _world_classes[model_key] = wanted
+
+        results = model.predict(
+            source=input_path,
+            conf=confidence,
+            iou=iou,
+            max_det=max_detections,
+            verbose=False,
+        )[0]
 
     height, width = results.orig_shape
     detections = []
@@ -193,14 +243,14 @@ def run_detection(
     return {
         "width": width,
         "height": height,
-        "model": MODEL_LABELS[model_key],
+        "model": spec["label"],
         "detections": detections,
     }
 
 
 @app.get("/health")
 def health():
-    return {"ok": True, "models": sorted(MODEL_FILES)}
+    return {"ok": True, "models": sorted(MODEL_SPECS)}
 
 
 @app.post("/jobs")
@@ -236,12 +286,17 @@ def process_job(req: JobRequest, authorization: Optional[str] = Header(None)):
         raise HTTPException(status_code=400, detail="Job has invalid storage paths")
 
     model_key = job.get("model") or DEFAULT_MODEL
-    if model_key not in MODEL_FILES:
+    if model_key not in MODEL_SPECS:
         raise HTTPException(status_code=400, detail=f"Unknown model: {model_key}")
 
     confidence = clamp(float(job.get("confidenceThreshold") or 0.25), 0.01, 0.99)
     iou = clamp(float(job.get("iouThreshold") or 0.45), 0.05, 0.95)
     max_detections = int(clamp(float(job.get("maxDetections") or 100), 1, 300))
+    prompt_classes = (
+        parse_class_prompt(job.get("classPrompt"))
+        if MODEL_SPECS[model_key].get("world")
+        else []
+    )
 
     update_job(
         req.jobId,
@@ -273,6 +328,7 @@ def process_job(req: JobRequest, authorization: Optional[str] = Header(None)):
                 confidence,
                 iou,
                 max_detections,
+                prompt_classes,
             )
             runtime_ms = int((time.time() - start) * 1000)
 
@@ -287,6 +343,7 @@ def process_job(req: JobRequest, authorization: Optional[str] = Header(None)):
                 "confidenceThreshold": confidence,
                 "iouThreshold": iou,
                 "maxDetections": max_detections,
+                "classPrompt": ", ".join(prompt_classes) if prompt_classes else None,
                 "runtimeMs": runtime_ms,
                 **result_payload,
             }
@@ -314,6 +371,9 @@ def process_job(req: JobRequest, authorization: Optional[str] = Header(None)):
                         "runtimeMs": runtime_ms,
                         "iouThreshold": iou,
                         "maxDetections": max_detections,
+                        "classPrompt": ", ".join(prompt_classes)
+                        if prompt_classes
+                        else None,
                     },
                 },
             )

@@ -27,22 +27,54 @@ import type { Detection } from "@/lib/detectionTypes";
 export type DetectionJobStatus = "queued" | "running" | "complete" | "failed";
 export type DetectionArtifactKind = "annotatedImage" | "json" | "csv";
 
-export type DetectionModelId = "yolov8n" | "yolov8s";
+export type DetectionModelId =
+  | "yolov8n"
+  | "yolov8s"
+  | "yolo11n"
+  | "yolo11s"
+  | "yolo12n"
+  | "rtdetr-l"
+  | "yolov8s-world";
 
 export const DETECTION_MODELS: Array<{
   id: DetectionModelId;
   label: string;
   hint: string;
+  /** Open-vocabulary model driven by a text class prompt. */
+  world?: boolean;
+  /** DETR-style detector without non-maximum suppression. */
+  noNms?: boolean;
 }> = [
   { id: "yolov8n", label: "YOLOv8n", hint: "Fast · recommended" },
   { id: "yolov8s", label: "YOLOv8s", hint: "Balanced · more accurate" },
+  { id: "yolo11n", label: "YOLO11n", hint: "Newer generation · fast" },
+  { id: "yolo11s", label: "YOLO11s", hint: "Newer generation · more accurate" },
+  { id: "yolo12n", label: "YOLO12n", hint: "Attention-based · slower on CPU" },
+  {
+    id: "rtdetr-l",
+    label: "RT-DETR-L",
+    hint: "Transformer · slowest, NMS-free",
+    noNms: true,
+  },
+  {
+    id: "yolov8s-world",
+    label: "YOLOv8s-World",
+    hint: "Open vocabulary · custom classes",
+    world: true,
+  },
 ];
+
+export function getModelInfo(id: DetectionModelId) {
+  return DETECTION_MODELS.find((model) => model.id === id) ?? DETECTION_MODELS[0];
+}
 
 export interface InferenceOptions {
   confidenceThreshold: number;
   model: DetectionModelId;
   iouThreshold: number;
   maxDetections: number;
+  /** Comma-separated class list for open-vocabulary models; "" = default. */
+  classPrompt: string;
 }
 
 export const DEFAULT_INFERENCE_OPTIONS: InferenceOptions = {
@@ -50,6 +82,7 @@ export const DEFAULT_INFERENCE_OPTIONS: InferenceOptions = {
   model: "yolov8n",
   iouThreshold: 0.45,
   maxDetections: 100,
+  classPrompt: "",
 };
 
 export interface DetectionJobResult {
@@ -268,6 +301,7 @@ export async function createDetectionJob({
   model,
   iouThreshold,
   maxDetections,
+  classPrompt,
   onUploadProgress,
 }: CreateDetectionJobOptions) {
   const user = await ensureAnonymousUser();
@@ -308,6 +342,9 @@ export async function createDetectionJob({
     model,
     iouThreshold,
     maxDetections,
+    classPrompt: getModelInfo(model).world
+      ? classPrompt.trim() || null
+      : null,
     ownerId: user.uid,
     input: {
       storagePath: inputPath,

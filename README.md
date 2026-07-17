@@ -319,7 +319,7 @@ Example result structure written back to Firestore:
 
 ## Deploying the detection API
 
-Both model weights are baked into the Docker image at build time, so cold starts never download them.
+All model weights (YOLOv8 n/s, YOLO11 n/s, YOLO12n, RT-DETR-L, YOLOv8s-World plus its CLIP text encoder) are baked into the Docker image at build time, so cold starts never download them.
 
 From the repository root:
 
@@ -330,7 +330,7 @@ gcloud run deploy detection-api \
   --source services/detection-api \
   --region us-east1 \
   --allow-unauthenticated \
-  --memory 2Gi \
+  --memory 4Gi \
   --cpu 2 \
   --timeout 900 \
   --min-instances 0 \

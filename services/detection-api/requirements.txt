@@ -1,7 +1,7 @@
 fastapi==0.115.6
 uvicorn[standard]==0.32.1
 firebase-admin==6.6.0
-ultralytics==8.3.48
+ultralytics==8.4.99
 opencv-python-headless==4.10.0.84
 pandas==2.2.3
 python-multipart==0.0.19
