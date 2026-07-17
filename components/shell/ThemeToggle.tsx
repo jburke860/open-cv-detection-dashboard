@@ -21,7 +21,15 @@ export function ThemeToggle() {
   return (
     <button
       type="button"
-      aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
+      // The theme is unknown during SSR, so keep the label neutral until
+      // hydration to avoid a server/client attribute mismatch.
+      aria-label={
+        mounted
+          ? isDark
+            ? "Switch to light theme"
+            : "Switch to dark theme"
+          : "Toggle theme"
+      }
       onClick={() => setTheme(isDark ? "light" : "dark")}
       className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-line bg-surface-1 text-ink-muted transition hover:border-accent hover:text-accent"
     >
