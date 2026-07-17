@@ -1,7 +1,7 @@
 import type { Detection, DetectionFile, DetectionSummary } from "./detectionTypes";
 
 /** Bump when sample images or detection JSON change to bust browser cache. */
-export const ASSET_VERSION = "3";
+export const ASSET_VERSION = "4";
 
 export function withAssetVersion(path: string): string {
   const separator = path.includes("?") ? "&" : "?";
