@@ -37,14 +37,6 @@ The demo ships seven pretrained models: YOLOv8 n/s, YOLO11 n/s (the default), YO
 
 ![Detection workspace, light theme](images/readme-screenshots/dashboard-light.png)
 
-### Batch processing
-
-![Batch processing](images/readme-screenshots/batch-processing.png)
-
-### Live camera
-
-![Live camera](images/readme-screenshots/live-camera.png)
-
 ## Key features
 
 - Hosted Next.js/TypeScript dashboard with sidebar navigation
