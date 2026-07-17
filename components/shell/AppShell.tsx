@@ -103,7 +103,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <main className="min-w-0 flex-1 px-4 py-6 sm:px-6">{children}</main>
 
         <footer className="border-t border-line px-4 py-4 text-center text-xs text-ink-faint sm:px-6">
-          Built with Next.js, Firebase, Cloud Run, and YOLOv8 · Made by Jeremy
+          Built with Next.js, Firebase, Cloud Run, and Ultralytics YOLO · Made by Jeremy
           Burke
         </footer>
       </div>

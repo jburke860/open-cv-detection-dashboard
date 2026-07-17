@@ -12,21 +12,22 @@ const TECH_TAGS = [
   "Firebase",
   "Cloud Run",
   "FastAPI",
-  "YOLOv8",
+  "Ultralytics YOLO",
+  "RT-DETR",
 ];
 
 /**
- * Real YOLOv8n detections from public/detections/urban-intersection.json,
+ * Real YOLO11n detections from public/detections/urban-intersection.json,
  * converted to percentages of the 1331 × 749 source image so the hero
  * illustration shows genuine model output, not invented boxes.
  */
 const HERO_BOXES = [
-  { label: "motorcycle", conf: "72%", x: 2.9, y: 65.7, w: 14.8, h: 28.6, showLabel: true },
-  { label: "car", conf: "73%", x: 40.2, y: 64.5, w: 15.5, h: 11.6, showLabel: true },
-  { label: "motorcycle", conf: "69%", x: 87.8, y: 69.3, w: 10.6, h: 9.6, showLabel: true },
-  { label: "person", conf: "54%", x: 29.8, y: 64.8, w: 7.0, h: 17.9, showLabel: false },
-  { label: "clock", conf: "66%", x: 33.1, y: 40.7, w: 2.2, h: 4.7, showLabel: true },
-  { label: "person", conf: "60%", x: 66.0, y: 64.2, w: 1.7, h: 6.3, showLabel: false },
+  { label: "motorcycle", conf: "71%", x: 87.8, y: 68.9, w: 10.5, h: 10.1, showLabel: true },
+  { label: "motorcycle", conf: "69%", x: 26.4, y: 68.8, w: 13.4, h: 16.6, showLabel: true },
+  { label: "car", conf: "66%", x: 40.6, y: 64.5, w: 14.4, h: 11.7, showLabel: true },
+  { label: "motorcycle", conf: "62%", x: 3.1, y: 69.8, w: 14.8, h: 24.4, showLabel: true },
+  { label: "person", conf: "52%", x: 66.0, y: 64.1, w: 1.7, h: 6.5, showLabel: false },
+  { label: "car", conf: "48%", x: 95.3, y: 64.0, w: 4.7, h: 7.6, showLabel: false },
 ];
 
 export function Hero() {
@@ -59,9 +60,11 @@ export function Hero() {
           </h1>
 
           <p className="mt-4 max-w-xl text-sm leading-6 text-ink-muted">
-            Upload an image or pick a sample scene, run live YOLOv8 object
-            detection through a Firebase + Cloud Run pipeline, and export the
-            annotated image plus JSON and CSV detection outputs.
+            Upload an image or pick a sample scene, run live object detection
+            with seven models — YOLOv8 through YOLO12, RT-DETR, and
+            open-vocabulary YOLO-World — through a Firebase + Cloud Run
+            pipeline, and export the annotated image plus JSON and CSV
+            outputs.
           </p>
 
           <div className="mt-5 flex flex-wrap gap-2 text-sm">
@@ -110,7 +113,7 @@ function HeroIllustration() {
           urban-intersection.jpg
         </span>
         <span className="font-mono text-[10px] text-ink-faint">
-          YOLOv8n · 30 objects
+          YOLO11n · 22 objects
         </span>
       </div>
 
@@ -118,7 +121,7 @@ function HeroIllustration() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={withAssetVersion("/images/urban-intersection.jpg")}
-          alt="Urban intersection sample with YOLOv8 bounding boxes"
+          alt="Urban intersection sample with YOLO11 bounding boxes"
           className="h-full w-full object-cover"
         />
 
@@ -156,7 +159,7 @@ function HeroIllustration() {
       </div>
 
       <figcaption className="flex items-center justify-between border-t border-line bg-surface-1 px-3 py-2 text-[10px] text-ink-faint">
-        <span>Real YOLOv8n output from the sample gallery</span>
+        <span>Real YOLO11n output from the sample gallery</span>
         <span className="flex items-center gap-1 font-medium text-success">
           <span className="cv-pulse-dot h-1.5 w-1.5 rounded-full bg-success" />
           Pipeline live

@@ -173,7 +173,7 @@ export function CameraWorkspace() {
           runner.job?.result?.model ??
           (DETECTION_MODELS.find((model) => model.id === settings.model)
             ?.label ??
-            "YOLOv8n"),
+            "YOLO11n"),
         detections: runner.job?.result?.detections ?? [],
         kind: "upload",
         job: runner.job ?? undefined,

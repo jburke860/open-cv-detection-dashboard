@@ -38,7 +38,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
             OpenCV Detection
           </p>
           <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-ink-faint">
-            YOLOv8 dashboard
+            Multi-model dashboard
           </p>
         </div>
       </div>

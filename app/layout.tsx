@@ -23,7 +23,7 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "OpenCV Detection Dashboard",
   description:
-    "Upload an image or pick a sample scene, run live YOLOv8 object detection through a Firebase + Cloud Run pipeline, and export annotated results.",
+    "Upload an image or pick a sample scene, run live object detection across YOLO and RT-DETR models through a Firebase + Cloud Run pipeline, and export annotated results.",
 };
 
 export default function RootLayout({

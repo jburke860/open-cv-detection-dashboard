@@ -2,9 +2,9 @@
 
 Made by Jeremy Burke.
 
-A hosted computer vision demo that lets users upload an image, capture a webcam frame, or batch-process multiple images, run YOLOv8 object detection, and explore the results in an interactive workspace — with annotated image, JSON, and CSV exports.
+A hosted computer vision demo that lets users upload an image, capture a webcam frame, or batch-process multiple images, run object detection with seven selectable models (YOLOv8/11/12, RT-DETR, and open-vocabulary YOLO-World), and explore the results in an interactive workspace — with annotated image, JSON, and CSV exports.
 
-The project demonstrates a full image-inference workflow: a Next.js/TypeScript frontend with a dark/light themed dashboard UI, Firebase Authentication, Firebase Storage, Firestore job tracking, and a Cloud Run FastAPI backend that runs YOLOv8/OpenCV inference.
+The project demonstrates a full image-inference workflow: a Next.js/TypeScript frontend with a dark/light themed dashboard UI, Firebase Authentication, Firebase Storage, Firestore job tracking, and a Cloud Run FastAPI backend that runs Ultralytics YOLO and RT-DETR inference.
 
 ## Live demo
 
@@ -15,7 +15,7 @@ The project demonstrates a full image-inference workflow: a Next.js/TypeScript f
 The dashboard has three detection surfaces, all rendered through one unified result workspace:
 
 1. **Detection workspace (live upload + samples)**
-   Upload a JPG, PNG, or WebP image, pick a model, tune the confidence threshold, NMS IoU, and max detections, and run live inference on Cloud Run. Or select one of the built-in urban sample scenes with precomputed YOLOv8 detections.
+   Upload a JPG, PNG, or WebP image, pick a model, tune the confidence threshold, NMS IoU, and max detections, and run live inference on Cloud Run. Or select one of the built-in urban sample scenes with precomputed YOLO11n detections.
 
 2. **Batch processing**
    Queue multiple images and run them through the pipeline with limited concurrency. Each item reports upload, processing, and completion state, and the page aggregates detection totals across the batch.
@@ -25,7 +25,7 @@ The dashboard has three detection surfaces, all rendered through one unified res
 
 Every result opens in the same explorer: Original / Annotated / Compare / Data viewer tabs, zoom and fullscreen, class filter chips, a searchable and sortable detections panel with a per-detection inspector, real computed analytics (class frequency, confidence histogram, confidence bands), rule-based insights, and client-side exports that reflect the current filters.
 
-The demo uses `yolov8n.pt` and `yolov8s.pt`, pretrained YOLOv8 weights optimized for common object classes such as people, cars, bicycles, motorcycles, buses, trucks, and other everyday scene objects.
+The demo ships seven pretrained models: YOLOv8 n/s, YOLO11 n/s (the default), YOLO12n, RT-DETR-L (a transformer detector), and YOLOv8s-World, an open-vocabulary model that detects free-form text-prompted classes. The fixed-vocabulary models cover the 80 COCO classes — people, cars, bicycles, motorcycles, buses, trucks, and other everyday scene objects.
 
 ## Screenshots
 
@@ -49,7 +49,7 @@ The demo uses `yolov8n.pt` and `yolov8s.pt`, pretrained YOLOv8 weights optimized
 
 - Hosted Next.js/TypeScript dashboard with sidebar navigation
 - Dark "command center" theme with a full light theme toggle
-- Model picker (YOLOv8n fast / YOLOv8s balanced)
+- Model picker spanning three YOLO generations plus RT-DETR and open-vocabulary YOLO-World (with a custom class prompt)
 - Confidence threshold, NMS IoU threshold, and max-detections controls passed to real inference
 - Live image upload workflow with drag & drop
 - Batch upload queue with limited concurrency and aggregate stats
@@ -94,7 +94,7 @@ Cloud Run verifies the token, loads the job document, and checks that
 the caller owns the job and its storage paths
         |
         v
-YOLOv8 / OpenCV inference (yolov8n or yolov8s)
+Ultralytics inference (YOLOv8/11/12, RT-DETR, or YOLO-World)
         |
         v
 Cloud Run writes annotated image, JSON, and CSV to Storage
@@ -114,7 +114,7 @@ The Cloud Run service never trusts request-body parameters: everything except th
 Public sample image
         |
         v
-Precomputed YOLOv8 JSON detections
+Precomputed YOLO11n JSON detections
         |
         v
 Next.js dashboard
@@ -148,7 +148,7 @@ Same client-side viewer as live uploads
 
 ### Computer vision
 
-- YOLOv8n and YOLOv8s
+- YOLOv8 n/s, YOLO11 n/s, YOLO12n, RT-DETR-L, and YOLOv8s-World
 - Ultralytics
 - OpenCV
 
@@ -308,7 +308,7 @@ Example result structure written back to Firestore:
     "csvPath": "detection-jobs/{uid}/{jobId}/output/detections.csv",
     "width": 1280,
     "height": 720,
-    "model": "YOLOv8n",
+    "model": "YOLO11n",
     "detections": [],
     "runtimeMs": 9880,
     "iouThreshold": 0.45,
@@ -405,7 +405,7 @@ manually from the Firebase console if needed.
 
 ## Regenerating sample detections locally
 
-The built-in sample scenes use precomputed YOLOv8 detection JSON files stored in:
+The built-in sample scenes use precomputed YOLO11n detection JSON files stored in:
 
 ```text
 public/detections/
@@ -429,7 +429,7 @@ pip install -r scripts/requirements.txt
 python scripts/generate_detections.py
 ```
 
-The script reads sample images, runs YOLOv8n inference, and writes updated JSON detection files.
+The script reads sample images, runs YOLO11n inference, and writes updated JSON detection files.
 
 ## Detection JSON format
 
@@ -443,7 +443,7 @@ Each detection file contains image metadata and object-detection results.
   "description": "Urban roadway with vehicles, pedestrians, and traffic signals",
   "width": 1280,
   "height": 853,
-  "model": "YOLOv8n",
+  "model": "YOLO11n",
   "generatedBy": "scripts/generate_detections.py",
   "detections": [
     {

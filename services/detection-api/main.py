@@ -26,7 +26,7 @@ STORAGE_BUCKET = os.environ.get(
     "open-cv-detection-dashboard.firebasestorage.app",
 )
 
-DEFAULT_MODEL = "yolov8n"
+DEFAULT_MODEL = "yolo11n"
 
 # All weight files are baked into the Docker image (see Dockerfile), so
 # lazy-loading a model never hits the network.

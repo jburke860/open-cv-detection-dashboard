@@ -4,7 +4,7 @@ const PIPELINE_STEPS = [
   "Upload an image from the dashboard",
   "The image is stored securely in Firebase Storage",
   "A Firestore job tracks inference status in real time",
-  "Cloud Run processes the image with YOLOv8/OpenCV",
+  "Cloud Run processes the image with the selected YOLO/RT-DETR model",
   "Download the annotated image, JSON, or CSV results",
 ];
 
@@ -45,7 +45,7 @@ export function AboutSection() {
             <li>Next.js + TypeScript frontend development</li>
             <li>Firebase Auth, Storage, and Firestore integration</li>
             <li>Cloud Run FastAPI backend deployment</li>
-            <li>YOLOv8/OpenCV object detection</li>
+            <li>Multi-model detection (YOLOv8–12, RT-DETR, YOLO-World)</li>
             <li>Asynchronous job status tracking</li>
             <li>Annotated image, JSON, and CSV generation</li>
           </ul>

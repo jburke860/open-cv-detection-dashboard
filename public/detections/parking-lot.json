@@ -5,271 +5,271 @@
   "description": "Open parking area with parked vehicles and roadway context",
   "width": 1371,
   "height": 1032,
-  "model": "YOLOv8n",
+  "model": "YOLO11n",
   "generatedBy": "Ultralytics YOLOv8 local inference (scripts/generate_detections.py)",
   "detections": [
     {
       "id": 1,
       "label": "car",
-      "confidence": 0.912,
+      "confidence": 0.9022,
       "box": {
-        "x": 376,
-        "y": 679,
-        "width": 193,
-        "height": 78
+        "x": 974,
+        "y": 702,
+        "width": 269,
+        "height": 136
       }
     },
     {
       "id": 2,
       "label": "car",
-      "confidence": 0.8941,
+      "confidence": 0.8748,
       "box": {
-        "x": 147,
-        "y": 692,
-        "width": 233,
-        "height": 81
+        "x": 377,
+        "y": 680,
+        "width": 191,
+        "height": 76
       }
     },
     {
       "id": 3,
       "label": "car",
-      "confidence": 0.8727,
+      "confidence": 0.8369,
       "box": {
-        "x": 623,
-        "y": 687,
-        "width": 214,
-        "height": 87
+        "x": 625,
+        "y": 688,
+        "width": 220,
+        "height": 86
       }
     },
     {
       "id": 4,
       "label": "car",
-      "confidence": 0.8631,
+      "confidence": 0.8284,
       "box": {
-        "x": 973,
-        "y": 700,
-        "width": 268,
-        "height": 136
+        "x": 1213,
+        "y": 678,
+        "width": 158,
+        "height": 128
       }
     },
     {
       "id": 5,
       "label": "car",
-      "confidence": 0.8439,
+      "confidence": 0.8164,
       "box": {
-        "x": 1213,
-        "y": 678,
-        "width": 158,
-        "height": 130
+        "x": 147,
+        "y": 690,
+        "width": 234,
+        "height": 82
       }
     },
     {
       "id": 6,
       "label": "car",
-      "confidence": 0.7622,
+      "confidence": 0.6864,
       "box": {
-        "x": 65,
-        "y": 673,
-        "width": 164,
-        "height": 95
+        "x": 953,
+        "y": 664,
+        "width": 151,
+        "height": 77
       }
     },
     {
       "id": 7,
       "label": "car",
-      "confidence": 0.7317,
+      "confidence": 0.6397,
       "box": {
-        "x": 5,
-        "y": 677,
-        "width": 122,
-        "height": 56
+        "x": 63,
+        "y": 683,
+        "width": 175,
+        "height": 83
       }
     },
     {
       "id": 8,
       "label": "car",
-      "confidence": 0.7197,
+      "confidence": 0.6312,
       "box": {
-        "x": 778,
-        "y": 660,
-        "width": 156,
-        "height": 80
+        "x": 0,
+        "y": 678,
+        "width": 123,
+        "height": 54
       }
     },
     {
       "id": 9,
       "label": "car",
-      "confidence": 0.6632,
+      "confidence": 0.5694,
       "box": {
-        "x": 326,
-        "y": 660,
-        "width": 98,
-        "height": 55
+        "x": 779,
+        "y": 661,
+        "width": 157,
+        "height": 93
       }
     },
     {
       "id": 10,
       "label": "car",
-      "confidence": 0.6593,
+      "confidence": 0.5291,
       "box": {
-        "x": 956,
-        "y": 658,
-        "width": 148,
-        "height": 79
+        "x": 517,
+        "y": 663,
+        "width": 86,
+        "height": 58
       }
     },
     {
       "id": 11,
       "label": "car",
-      "confidence": 0.6349,
+      "confidence": 0.4957,
       "box": {
-        "x": 921,
-        "y": 655,
-        "width": 80,
-        "height": 47
+        "x": 64,
+        "y": 684,
+        "width": 266,
+        "height": 88
       }
     },
     {
       "id": 12,
       "label": "car",
-      "confidence": 0.6239,
+      "confidence": 0.4923,
       "box": {
-        "x": 511,
+        "x": 1072,
         "y": 664,
-        "width": 90,
-        "height": 59
+        "width": 151,
+        "height": 43
       }
     },
     {
       "id": 13,
       "label": "car",
-      "confidence": 0.3853,
+      "confidence": 0.4518,
       "box": {
-        "x": 1074,
-        "y": 667,
-        "width": 142,
-        "height": 46
+        "x": 321,
+        "y": 659,
+        "width": 107,
+        "height": 59
       }
     },
     {
       "id": 14,
       "label": "car",
-      "confidence": 0.3527,
+      "confidence": 0.4386,
       "box": {
-        "x": 637,
-        "y": 649,
-        "width": 122,
-        "height": 60
+        "x": 839,
+        "y": 663,
+        "width": 98,
+        "height": 72
       }
     },
     {
       "id": 15,
       "label": "car",
-      "confidence": 0.3437,
+      "confidence": 0.3647,
       "box": {
-        "x": 1197,
-        "y": 642,
-        "width": 139,
-        "height": 53
+        "x": 1202,
+        "y": 643,
+        "width": 136,
+        "height": 51
       }
     },
     {
       "id": 16,
       "label": "car",
-      "confidence": 0.3255,
+      "confidence": 0.3411,
       "box": {
-        "x": 0,
-        "y": 673,
-        "width": 28,
-        "height": 58
+        "x": 921,
+        "y": 655,
+        "width": 82,
+        "height": 48
       }
     },
     {
       "id": 17,
       "label": "car",
-      "confidence": 0.2739,
+      "confidence": 0.2946,
       "box": {
-        "x": 0,
-        "y": 665,
-        "width": 18,
-        "height": 66
+        "x": 1139,
+        "y": 666,
+        "width": 66,
+        "height": 29
       }
     },
     {
       "id": 18,
-      "label": "truck",
-      "confidence": 0.2328,
+      "label": "car",
+      "confidence": 0.2902,
       "box": {
-        "x": 1199,
-        "y": 643,
-        "width": 135,
-        "height": 55
+        "x": 634,
+        "y": 649,
+        "width": 129,
+        "height": 64
       }
     },
     {
       "id": 19,
       "label": "car",
-      "confidence": 0.2278,
+      "confidence": 0.2774,
       "box": {
-        "x": 0,
-        "y": 688,
-        "width": 25,
-        "height": 46
+        "x": 1074,
+        "y": 668,
+        "width": 107,
+        "height": 38
       }
     },
     {
       "id": 20,
       "label": "car",
-      "confidence": 0.2143,
+      "confidence": 0.262,
       "box": {
-        "x": 665,
-        "y": 646,
+        "x": 1139,
+        "y": 669,
         "width": 95,
-        "height": 42
+        "height": 44
       }
     },
     {
       "id": 21,
-      "label": "traffic light",
-      "confidence": 0.2142,
+      "label": "car",
+      "confidence": 0.2611,
       "box": {
-        "x": 761,
-        "y": 545,
-        "width": 29,
-        "height": 35
+        "x": 1086,
+        "y": 666,
+        "width": 122,
+        "height": 31
       }
     },
     {
       "id": 22,
       "label": "car",
-      "confidence": 0.2127,
+      "confidence": 0.2188,
       "box": {
-        "x": 1133,
-        "y": 668,
-        "width": 99,
-        "height": 43
+        "x": 124,
+        "y": 664,
+        "width": 104,
+        "height": 29
       }
     },
     {
       "id": 23,
       "label": "car",
-      "confidence": 0.2087,
+      "confidence": 0.2144,
       "box": {
-        "x": 31,
-        "y": 678,
-        "width": 107,
-        "height": 52
+        "x": 920,
+        "y": 658,
+        "width": 58,
+        "height": 45
       }
     },
     {
       "id": 24,
       "label": "car",
-      "confidence": 0.2036,
+      "confidence": 0.206,
       "box": {
-        "x": 958,
-        "y": 673,
-        "width": 122,
-        "height": 68
+        "x": 767,
+        "y": 652,
+        "width": 67,
+        "height": 27
       }
     }
   ]

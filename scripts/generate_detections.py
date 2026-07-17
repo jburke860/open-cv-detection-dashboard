@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_IMAGE_DIR = ROOT / "public" / "images"
 DATA_IMAGE_DIR = ROOT / "data" / "sample_images"
 OUTPUT_DIR = ROOT / "public" / "detections"
-MODEL_NAME = "yolov8n.pt"
+MODEL_NAME = "yolo11n.pt"
 CONFIDENCE_THRESHOLD = 0.20
 
 TITLES = {
@@ -112,7 +112,7 @@ def main() -> None:
             "description": description,
             "width": width,
             "height": height,
-            "model": "YOLOv8n",
+            "model": "YOLO11n",
             "generatedBy": "Ultralytics YOLOv8 local inference (scripts/generate_detections.py)",
             "detections": detections,
         }

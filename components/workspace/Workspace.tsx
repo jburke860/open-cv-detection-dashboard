@@ -109,7 +109,7 @@ export function Workspace() {
           job?.result?.model ??
           (DETECTION_MODELS.find((model) => model.id === settings.model)
             ?.label ??
-            "YOLOv8n"),
+            "YOLO11n"),
         detections: job?.result?.detections ?? [],
         kind: "upload",
         job: job ?? undefined,

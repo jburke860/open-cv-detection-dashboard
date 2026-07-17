@@ -45,10 +45,10 @@ export const DETECTION_MODELS: Array<{
   /** DETR-style detector without non-maximum suppression. */
   noNms?: boolean;
 }> = [
-  { id: "yolov8n", label: "YOLOv8n", hint: "Fast · recommended" },
-  { id: "yolov8s", label: "YOLOv8s", hint: "Balanced · more accurate" },
-  { id: "yolo11n", label: "YOLO11n", hint: "Newer generation · fast" },
-  { id: "yolo11s", label: "YOLO11s", hint: "Newer generation · more accurate" },
+  { id: "yolo11n", label: "YOLO11n", hint: "Fast · recommended" },
+  { id: "yolo11s", label: "YOLO11s", hint: "Balanced · more accurate" },
+  { id: "yolov8n", label: "YOLOv8n", hint: "Previous generation · fast" },
+  { id: "yolov8s", label: "YOLOv8s", hint: "Previous generation · accurate" },
   { id: "yolo12n", label: "YOLO12n", hint: "Attention-based · slower on CPU" },
   {
     id: "rtdetr-l",
@@ -79,7 +79,7 @@ export interface InferenceOptions {
 
 export const DEFAULT_INFERENCE_OPTIONS: InferenceOptions = {
   confidenceThreshold: 0.25,
-  model: "yolov8n",
+  model: "yolo11n",
   iouThreshold: 0.45,
   maxDetections: 100,
   classPrompt: "",

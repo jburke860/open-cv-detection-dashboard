@@ -22,7 +22,7 @@ export function SampleScenes({
           Or choose a sample scene
         </h2>
         <p className="hidden text-xs text-ink-muted sm:block">
-          Public urban-scene photos with precomputed YOLOv8 detections
+          Public urban-scene photos with precomputed YOLO11n detections
         </p>
       </div>
       <div className="mt-2.5 grid grid-cols-3 gap-2.5 sm:grid-cols-5">

@@ -5,359 +5,293 @@
   "description": "Downtown crossing with pedestrians, vehicles, and street signals",
   "width": 928,
   "height": 642,
-  "model": "YOLOv8n",
+  "model": "YOLO11n",
   "generatedBy": "Ultralytics YOLOv8 local inference (scripts/generate_detections.py)",
   "detections": [
     {
       "id": 1,
       "label": "traffic light",
-      "confidence": 0.8094,
+      "confidence": 0.8035,
       "box": {
-        "x": 238,
-        "y": 284,
+        "x": 237,
+        "y": 287,
         "width": 33,
-        "height": 66
+        "height": 65
       }
     },
     {
       "id": 2,
       "label": "person",
-      "confidence": 0.7672,
+      "confidence": 0.7522,
       "box": {
-        "x": 569,
-        "y": 511,
-        "width": 46,
-        "height": 110
+        "x": 567,
+        "y": 514,
+        "width": 48,
+        "height": 109
       }
     },
     {
       "id": 3,
       "label": "person",
-      "confidence": 0.7484,
+      "confidence": 0.7508,
       "box": {
-        "x": 215,
-        "y": 500,
-        "width": 57,
-        "height": 127
+        "x": 213,
+        "y": 501,
+        "width": 58,
+        "height": 126
       }
     },
     {
       "id": 4,
       "label": "person",
-      "confidence": 0.723,
+      "confidence": 0.7248,
       "box": {
-        "x": 894,
-        "y": 499,
-        "width": 34,
-        "height": 129
+        "x": 895,
+        "y": 501,
+        "width": 33,
+        "height": 126
       }
     },
     {
       "id": 5,
-      "label": "car",
-      "confidence": 0.7176,
+      "label": "person",
+      "confidence": 0.6667,
       "box": {
-        "x": 375,
-        "y": 487,
-        "width": 69,
-        "height": 71
+        "x": 117,
+        "y": 500,
+        "width": 46,
+        "height": 132
       }
     },
     {
       "id": 6,
       "label": "person",
-      "confidence": 0.7084,
-      "box": {
-        "x": 827,
-        "y": 501,
-        "width": 39,
-        "height": 96
-      }
-    },
-    {
-      "id": 7,
-      "label": "person",
-      "confidence": 0.6661,
-      "box": {
-        "x": 321,
-        "y": 496,
-        "width": 56,
-        "height": 121
-      }
-    },
-    {
-      "id": 8,
-      "label": "person",
-      "confidence": 0.6533,
-      "box": {
-        "x": 628,
-        "y": 498,
-        "width": 34,
-        "height": 96
-      }
-    },
-    {
-      "id": 9,
-      "label": "person",
-      "confidence": 0.6496,
-      "box": {
-        "x": 86,
-        "y": 504,
-        "width": 41,
-        "height": 126
-      }
-    },
-    {
-      "id": 10,
-      "label": "person",
-      "confidence": 0.6434,
+      "confidence": 0.6456,
       "box": {
         "x": 431,
-        "y": 502,
+        "y": 503,
         "width": 38,
         "height": 114
       }
     },
     {
-      "id": 11,
-      "label": "person",
-      "confidence": 0.6107,
+      "id": 7,
+      "label": "car",
+      "confidence": 0.6392,
       "box": {
-        "x": 122,
+        "x": 373,
+        "y": 490,
+        "width": 71,
+        "height": 73
+      }
+    },
+    {
+      "id": 8,
+      "label": "person",
+      "confidence": 0.5957,
+      "box": {
+        "x": 827,
+        "y": 502,
+        "width": 39,
+        "height": 95
+      }
+    },
+    {
+      "id": 9,
+      "label": "person",
+      "confidence": 0.5768,
+      "box": {
+        "x": 508,
+        "y": 514,
+        "width": 40,
+        "height": 93
+      }
+    },
+    {
+      "id": 10,
+      "label": "person",
+      "confidence": 0.5743,
+      "box": {
+        "x": 318,
         "y": 498,
-        "width": 38,
-        "height": 130
+        "width": 59,
+        "height": 120
+      }
+    },
+    {
+      "id": 11,
+      "label": "traffic light",
+      "confidence": 0.5418,
+      "box": {
+        "x": 624,
+        "y": 299,
+        "width": 28,
+        "height": 60
       }
     },
     {
       "id": 12,
       "label": "person",
-      "confidence": 0.5789,
+      "confidence": 0.5343,
       "box": {
-        "x": 20,
-        "y": 507,
+        "x": 629,
+        "y": 499,
         "width": 39,
-        "height": 105
+        "height": 95
       }
     },
     {
       "id": 13,
       "label": "person",
-      "confidence": 0.5662,
+      "confidence": 0.4527,
       "box": {
-        "x": 509,
-        "y": 513,
-        "width": 39,
-        "height": 93
+        "x": 22,
+        "y": 510,
+        "width": 38,
+        "height": 103
       }
     },
     {
       "id": 14,
       "label": "person",
-      "confidence": 0.4963,
+      "confidence": 0.4471,
       "box": {
-        "x": 462,
-        "y": 500,
-        "width": 31,
-        "height": 102
+        "x": 872,
+        "y": 496,
+        "width": 32,
+        "height": 88
       }
     },
     {
       "id": 15,
-      "label": "car",
-      "confidence": 0.4233,
+      "label": "person",
+      "confidence": 0.4403,
       "box": {
-        "x": 208,
-        "y": 501,
-        "width": 100,
-        "height": 89
+        "x": 85,
+        "y": 503,
+        "width": 43,
+        "height": 136
       }
     },
     {
       "id": 16,
-      "label": "person",
-      "confidence": 0.4175,
+      "label": "traffic light",
+      "confidence": 0.4306,
       "box": {
-        "x": 293,
-        "y": 496,
-        "width": 26,
-        "height": 102
+        "x": 86,
+        "y": 410,
+        "width": 15,
+        "height": 38
       }
     },
     {
       "id": 17,
       "label": "traffic light",
-      "confidence": 0.3884,
+      "confidence": 0.3694,
       "box": {
-        "x": 148,
-        "y": 160,
-        "width": 37,
-        "height": 79
+        "x": 151,
+        "y": 133,
+        "width": 35,
+        "height": 105
       }
     },
     {
       "id": 18,
-      "label": "handbag",
-      "confidence": 0.3818,
+      "label": "person",
+      "confidence": 0.3665,
       "box": {
-        "x": 212,
-        "y": 533,
-        "width": 32,
-        "height": 46
+        "x": 803,
+        "y": 497,
+        "width": 29,
+        "height": 87
       }
     },
     {
       "id": 19,
       "label": "person",
-      "confidence": 0.3718,
+      "confidence": 0.3413,
       "box": {
-        "x": 802,
-        "y": 494,
+        "x": 628,
+        "y": 500,
         "width": 28,
-        "height": 90
+        "height": 93
       }
     },
     {
       "id": 20,
-      "label": "traffic light",
-      "confidence": 0.3716,
+      "label": "person",
+      "confidence": 0.3208,
       "box": {
-        "x": 85,
-        "y": 409,
-        "width": 15,
-        "height": 39
+        "x": 293,
+        "y": 502,
+        "width": 27,
+        "height": 98
       }
     },
     {
       "id": 21,
       "label": "person",
-      "confidence": 0.3635,
+      "confidence": 0.3159,
       "box": {
-        "x": 875,
-        "y": 493,
-        "width": 29,
-        "height": 88
+        "x": 68,
+        "y": 500,
+        "width": 28,
+        "height": 105
       }
     },
     {
       "id": 22,
       "label": "traffic light",
-      "confidence": 0.3616,
+      "confidence": 0.3104,
       "box": {
-        "x": 627,
-        "y": 300,
-        "width": 24,
-        "height": 58
+        "x": 127,
+        "y": 362,
+        "width": 23,
+        "height": 62
       }
     },
     {
       "id": 23,
-      "label": "car",
-      "confidence": 0.3084,
+      "label": "person",
+      "confidence": 0.2946,
       "box": {
-        "x": 246,
-        "y": 498,
-        "width": 54,
-        "height": 87
+        "x": 461,
+        "y": 501,
+        "width": 29,
+        "height": 104
       }
     },
     {
       "id": 24,
-      "label": "traffic light",
-      "confidence": 0.2978,
+      "label": "person",
+      "confidence": 0.2734,
       "box": {
-        "x": 506,
-        "y": 371,
-        "width": 16,
-        "height": 52
+        "x": 77,
+        "y": 498,
+        "width": 46,
+        "height": 124
       }
     },
     {
       "id": 25,
-      "label": "person",
-      "confidence": 0.278,
+      "label": "traffic light",
+      "confidence": 0.2164,
       "box": {
-        "x": 787,
-        "y": 506,
+        "x": 770,
+        "y": 419,
         "width": 22,
-        "height": 75
+        "height": 38
       }
     },
     {
       "id": 26,
       "label": "traffic light",
-      "confidence": 0.2728,
+      "confidence": 0.2017,
       "box": {
-        "x": 111,
-        "y": 123,
-        "width": 30,
-        "height": 94
-      }
-    },
-    {
-      "id": 27,
-      "label": "person",
-      "confidence": 0.2694,
-      "box": {
-        "x": 118,
-        "y": 499,
-        "width": 26,
-        "height": 133
-      }
-    },
-    {
-      "id": 28,
-      "label": "traffic light",
-      "confidence": 0.2465,
-      "box": {
-        "x": 628,
-        "y": 318,
-        "width": 22,
-        "height": 39
-      }
-    },
-    {
-      "id": 29,
-      "label": "person",
-      "confidence": 0.2373,
-      "box": {
-        "x": 630,
-        "y": 499,
-        "width": 25,
-        "height": 97
-      }
-    },
-    {
-      "id": 30,
-      "label": "person",
-      "confidence": 0.2262,
-      "box": {
-        "x": 689,
-        "y": 503,
-        "width": 22,
-        "height": 53
-      }
-    },
-    {
-      "id": 31,
-      "label": "person",
-      "confidence": 0.2239,
-      "box": {
-        "x": 108,
-        "y": 498,
-        "width": 41,
-        "height": 137
-      }
-    },
-    {
-      "id": 32,
-      "label": "traffic light",
-      "confidence": 0.2179,
-      "box": {
-        "x": 125,
-        "y": 360,
-        "width": 23,
-        "height": 62
+        "x": 775,
+        "y": 419,
+        "width": 16,
+        "height": 33
       }
     }
   ]

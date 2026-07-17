@@ -41,7 +41,7 @@ function itemToResult(
 ): WorkspaceResult {
   const modelLabel =
     DETECTION_MODELS.find((model) => model.id === settings.model)?.label ??
-    "YOLOv8n";
+    "YOLO11n";
 
   return {
     key: `${item.id}-${item.job?.id ?? "local"}`,
