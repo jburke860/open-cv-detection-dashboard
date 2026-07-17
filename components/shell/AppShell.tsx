@@ -74,7 +74,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Menu className="h-4 w-4" />
               </button>
               <div className="min-w-0">
-                <h1 className="truncate text-sm font-semibold text-ink sm:text-base">
+                <h1 className="truncate font-mono text-xs font-semibold uppercase tracking-[0.14em] text-accent sm:text-sm">
                   {page.title}
                 </h1>
                 <p className="hidden truncate text-xs text-ink-muted sm:block">

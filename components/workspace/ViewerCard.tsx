@@ -114,7 +114,7 @@ export function ViewerCard({
 
   return (
     <Card
-      className={cn("flex flex-col", fullscreen && "h-full rounded-none")}
+      className={cn("flex min-w-0 flex-col", fullscreen && "h-full rounded-none")}
       // Card renders a <section>; attach the fullscreen ref via wrapper below.
     >
       <div ref={cardRef} className="flex min-h-0 flex-1 flex-col bg-surface-1">
@@ -373,8 +373,10 @@ function ViewerStage({
     <div
       ref={stageRef}
       className={cn(
-        "relative flex min-h-0 overflow-auto bg-surface-0",
-        fullscreen ? "flex-1" : "h-[clamp(340px,58vh,680px)]"
+        // flex-1 lets the stage absorb whatever height the layout gives the
+        // card (e.g. matching the right rail), with a sane floor otherwise.
+        "relative flex min-h-0 flex-1 overflow-auto bg-surface-0",
+        !fullscreen && "min-h-[clamp(340px,52vh,640px)]"
       )}
     >
       <div

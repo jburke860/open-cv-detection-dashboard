@@ -18,12 +18,14 @@ export function SampleScenes({
   return (
     <section>
       <div className="flex items-baseline gap-2.5">
-        <h2 className="text-sm font-semibold text-ink">Sample scenes</h2>
-        <p className="text-xs text-ink-muted">
+        <h2 className="font-mono text-xs font-semibold uppercase tracking-[0.14em] text-ink">
+          Or choose a sample scene
+        </h2>
+        <p className="hidden text-xs text-ink-muted sm:block">
           Public urban-scene photos with precomputed YOLOv8 detections
         </p>
       </div>
-      <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
+      <div className="mt-2.5 grid grid-cols-3 gap-2.5 sm:grid-cols-5">
         {samples.map((sample) => {
           const selected = sample.id === selectedId;
           return (
@@ -31,10 +33,11 @@ export function SampleScenes({
               key={sample.id}
               type="button"
               onClick={() => onSelect(sample.id)}
+              title={sample.description}
               className={cn(
-                "group relative overflow-hidden rounded-xl border text-left transition",
+                "group relative overflow-hidden rounded-lg border text-left transition",
                 selected
-                  ? "border-accent shadow-[0_0_16px_var(--glow)]"
+                  ? "border-accent shadow-[0_0_14px_var(--glow)]"
                   : "border-line hover:border-line-strong"
               )}
             >
@@ -46,24 +49,20 @@ export function SampleScenes({
                   loading="lazy"
                   className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
                 />
-                {selected ? (
-                  <span className="absolute right-2 top-2 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-on-accent">
-                    <Check className="h-3 w-3" />
-                  </span>
-                ) : null}
-              </div>
-              <div className="bg-surface-1 px-2.5 py-2">
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent pt-6" />
                 <p
                   className={cn(
-                    "truncate text-xs font-semibold",
-                    selected ? "text-accent" : "text-ink"
+                    "absolute bottom-1.5 left-2 right-2 truncate text-[11px] font-semibold",
+                    selected ? "text-accent" : "text-white"
                   )}
                 >
                   {sample.title}
                 </p>
-                <p className="mt-0.5 truncate text-[11px] text-ink-faint">
-                  {sample.description}
-                </p>
+                {selected ? (
+                  <span className="absolute right-1.5 top-1.5 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-accent text-on-accent">
+                    <Check className="h-3 w-3" />
+                  </span>
+                ) : null}
               </div>
             </button>
           );
