@@ -52,7 +52,7 @@ export function DetectionsPanel({
   }, [detections, query, sortKey]);
 
   return (
-    <Card className="flex min-h-0 flex-1 flex-col">
+    <Card>
       <CardHeader
         title={`Detections (${detections.length})`}
         subtitle="Click a row to highlight and inspect"
@@ -80,7 +80,7 @@ export function DetectionsPanel({
         </Select>
       </div>
 
-      <ul className="min-h-0 max-h-96 flex-1 divide-y divide-line overflow-y-auto overscroll-contain">
+      <ul className="max-h-105 divide-y divide-line overflow-y-auto overscroll-contain">
         {rows.length === 0 ? (
           <li className="px-4 py-8 text-center text-xs text-ink-faint">
             {detections.length === 0

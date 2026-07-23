@@ -6,9 +6,10 @@ import { Badge } from "@/components/ui/Badge";
 import { AboutSection } from "@/components/workspace/AboutSection";
 import { AnalyticsPanel } from "@/components/workspace/AnalyticsPanel";
 import { DetectionsPanel } from "@/components/workspace/DetectionsPanel";
+import { DownloadsCard } from "@/components/workspace/DownloadsCard";
 import { Hero } from "@/components/workspace/Hero";
+import { InsightsPanel } from "@/components/workspace/InsightsPanel";
 import { SampleScenes } from "@/components/workspace/SampleScenes";
-import { SummaryCard } from "@/components/workspace/SummaryCard";
 import {
   UploadControls,
   jobStatusBadge,
@@ -261,38 +262,40 @@ export function Workspace() {
 
         {result ? (
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
-            {/* The viewer stretches to match the rail height, and the rail's
-                detections list flexes, so neither column leaves a gap.
-                Deliberately not keyed by result.key: remounting on every
-                sample switch blanks the stage for a frame and looks glitchy;
-                the viewer resets its own state when the result changes. */}
-            <ViewerCard
-              result={result}
-              visibleDetections={visibleDetections}
-              classChips={classChips}
-              classFilter={classFilter}
-              onToggleClass={toggleClass}
-              activeId={activeId}
-              onActiveId={handleActiveId}
-              headerBadges={headerBadges}
-              overlayMessage={overlayMessage}
-            />
-            <div className="flex flex-col gap-4">
-              <SummaryCard
+            <div className="min-w-0 space-y-4">
+              {/* Deliberately not keyed by result.key: remounting on every
+                  sample switch blanks the stage for a frame and looks
+                  glitchy; the viewer resets its own state when the result
+                  changes. */}
+              <ViewerCard
+                result={result}
+                visibleDetections={visibleDetections}
+                classChips={classChips}
+                classFilter={classFilter}
+                onToggleClass={toggleClass}
+                activeId={activeId}
+                onActiveId={handleActiveId}
+                headerBadges={headerBadges}
+                overlayMessage={overlayMessage}
+              />
+              <AnalyticsPanel
                 detections={visibleDetections}
                 runtimeMs={result.runtimeMs}
               />
+            </div>
+            <div className="space-y-4">
               <DetectionsPanel
                 detections={visibleDetections}
                 activeId={activeId}
                 onActiveId={handleActiveId}
               />
-            </div>
-            <div className="min-w-0 xl:col-span-2">
-              <AnalyticsPanel
+              <InsightsPanel
+                detections={visibleDetections}
+                threshold={threshold}
+              />
+              <DownloadsCard
                 result={result}
                 visibleDetections={visibleDetections}
-                threshold={threshold}
               />
             </div>
           </div>

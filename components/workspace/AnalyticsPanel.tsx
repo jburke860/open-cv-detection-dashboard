@@ -1,5 +1,6 @@
 "use client";
 
+import { Boxes, Crosshair, Gauge, Layers, Timer } from "lucide-react";
 import { useMemo } from "react";
 import {
   Bar,
@@ -14,10 +15,10 @@ import {
 } from "recharts";
 
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
-import { DownloadsCard } from "@/components/workspace/DownloadsCard";
-import { InsightsPanel } from "@/components/workspace/InsightsPanel";
+import { StatCard } from "@/components/ui/StatCard";
+import { colorForLabel } from "@/lib/detectionArtifacts";
 import type { Detection } from "@/lib/detectionTypes";
-import type { WorkspaceResult } from "@/lib/workspaceTypes";
+import { computeSummary, formatConfidence } from "@/lib/detectionUtils";
 
 const HISTOGRAM_BIN_SIZE = 0.1;
 
@@ -35,20 +36,27 @@ const TOOLTIP_STYLE = {
   color: "var(--ink)",
 };
 
-/**
- * Full-width strip below the viewer: confidence charts, insights, and
- * exports. Headline counts and the per-class breakdown live in the
- * right-rail SummaryCard.
- */
 export function AnalyticsPanel({
-  result,
-  visibleDetections: detections,
-  threshold,
+  detections,
+  runtimeMs,
 }: {
-  result: WorkspaceResult;
-  visibleDetections: Detection[];
-  threshold: number;
+  detections: Detection[];
+  runtimeMs?: number;
 }) {
+  const summary = useMemo(() => computeSummary(detections), [detections]);
+
+  const classData = useMemo(
+    () =>
+      Object.entries(summary.classCounts)
+        .sort((a, b) => b[1] - a[1])
+        .map(([label, count]) => ({
+          label,
+          count,
+          fill: colorForLabel(label),
+        })),
+    [summary.classCounts]
+  );
+
   const histogramData = useMemo(() => {
     const bins = Array.from(
       { length: Math.round(1 / HISTOGRAM_BIN_SIZE) },
@@ -87,88 +95,154 @@ export function AnalyticsPanel({
   );
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      {detections.length > 0 ? (
-        <>
-          <Card>
-        <CardHeader title="Confidence distribution" />
-        <CardBody className="h-56 p-2 sm:p-3">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={histogramData}
-              margin={{ top: 4, right: 8, bottom: 0, left: -18 }}
-            >
-              <XAxis
-                dataKey="bin"
-                stroke="var(--ink-faint)"
-                fontSize={10}
-                interval={1}
-              />
-              <YAxis
-                allowDecimals={false}
-                stroke="var(--ink-faint)"
-                fontSize={11}
-              />
-              <Tooltip
-                cursor={{ fill: "var(--accent-soft)" }}
-                contentStyle={TOOLTIP_STYLE}
-              />
-              <Bar
-                dataKey="count"
-                fill="var(--accent)"
-                radius={[3, 3, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </CardBody>
-      </Card>
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-5">
+        <StatCard
+          label="Detections"
+          value={summary.totalDetections}
+          icon={<Boxes className="h-4 w-4" />}
+        />
+        <StatCard
+          label="Classes"
+          value={summary.uniqueClasses}
+          icon={<Layers className="h-4 w-4" />}
+        />
+        <StatCard
+          label="Highest conf."
+          value={formatConfidence(summary.highestConfidence)}
+          icon={<Crosshair className="h-4 w-4" />}
+        />
+        <StatCard
+          label="Avg conf."
+          value={formatConfidence(summary.averageConfidence)}
+          icon={<Gauge className="h-4 w-4" />}
+        />
+        <StatCard
+          label="Inference"
+          value={
+            runtimeMs !== undefined ? `${(runtimeMs / 1000).toFixed(2)}s` : "—"
+          }
+          hint={runtimeMs !== undefined ? "Cloud Run runtime" : "Precomputed sample"}
+          icon={<Timer className="h-4 w-4" />}
+          className="col-span-2 sm:col-span-4 xl:col-span-1"
+        />
+      </div>
 
-      <Card>
-        <CardHeader title="Confidence bands" />
-        <CardBody className="flex h-56 items-center gap-2 p-2 sm:p-3">
-          <ResponsiveContainer width="55%" height="100%">
-            <PieChart>
-              <Pie
-                data={bandData}
-                dataKey="value"
-                nameKey="name"
-                innerRadius="55%"
-                outerRadius="85%"
-                paddingAngle={3}
-                stroke="var(--surface-1)"
-              >
-                {bandData.map((entry) => (
-                  <Cell key={entry.name} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip contentStyle={TOOLTIP_STYLE} />
-            </PieChart>
-          </ResponsiveContainer>
-          <ul className="flex-1 space-y-2 text-xs">
-            {bandData.map((band) => (
-              <li
-                key={band.name}
-                className="flex items-center justify-between gap-2"
-              >
-                <span className="flex items-center gap-1.5 text-ink-muted">
-                  <span
-                    className="h-2 w-2 rounded-full"
-                    style={{ backgroundColor: band.color }}
+      {detections.length > 0 ? (
+        <div className="grid gap-4 lg:grid-cols-3">
+          <Card>
+            <CardHeader title="Class frequency" />
+            <CardBody className="h-56 p-2 sm:p-3">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={classData}
+                  layout="vertical"
+                  margin={{ top: 4, right: 12, bottom: 0, left: 4 }}
+                >
+                  <XAxis
+                    type="number"
+                    allowDecimals={false}
+                    stroke="var(--ink-faint)"
+                    fontSize={11}
                   />
-                  {band.name}
-                </span>
-                <span className="font-mono font-semibold text-ink">
-                  {band.value}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </CardBody>
-      </Card>
-        </>
+                  <YAxis
+                    type="category"
+                    dataKey="label"
+                    width={82}
+                    stroke="var(--ink-faint)"
+                    fontSize={11}
+                  />
+                  <Tooltip
+                    cursor={{ fill: "var(--accent-soft)" }}
+                    contentStyle={TOOLTIP_STYLE}
+                  />
+                  <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={14}>
+                    {classData.map((entry) => (
+                      <Cell key={entry.label} fill={entry.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </CardBody>
+          </Card>
+
+          <Card>
+            <CardHeader title="Confidence distribution" />
+            <CardBody className="h-56 p-2 sm:p-3">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={histogramData}
+                  margin={{ top: 4, right: 8, bottom: 0, left: -18 }}
+                >
+                  <XAxis
+                    dataKey="bin"
+                    stroke="var(--ink-faint)"
+                    fontSize={10}
+                    interval={1}
+                  />
+                  <YAxis
+                    allowDecimals={false}
+                    stroke="var(--ink-faint)"
+                    fontSize={11}
+                  />
+                  <Tooltip
+                    cursor={{ fill: "var(--accent-soft)" }}
+                    contentStyle={TOOLTIP_STYLE}
+                  />
+                  <Bar
+                    dataKey="count"
+                    fill="var(--accent)"
+                    radius={[3, 3, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </CardBody>
+          </Card>
+
+          <Card>
+            <CardHeader title="Confidence bands" />
+            <CardBody className="flex h-56 items-center gap-2 p-2 sm:p-3">
+              <ResponsiveContainer width="55%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={bandData}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius="55%"
+                    outerRadius="85%"
+                    paddingAngle={3}
+                    stroke="var(--surface-1)"
+                  >
+                    {bandData.map((entry) => (
+                      <Cell key={entry.name} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip contentStyle={TOOLTIP_STYLE} />
+                </PieChart>
+              </ResponsiveContainer>
+              <ul className="flex-1 space-y-2 text-xs">
+                {bandData.map((band) => (
+                  <li
+                    key={band.name}
+                    className="flex items-center justify-between gap-2"
+                  >
+                    <span className="flex items-center gap-1.5 text-ink-muted">
+                      <span
+                        className="h-2 w-2 rounded-full"
+                        style={{ backgroundColor: band.color }}
+                      />
+                      {band.name}
+                    </span>
+                    <span className="font-mono font-semibold text-ink">
+                      {band.value}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </CardBody>
+          </Card>
+        </div>
       ) : null}
-      <InsightsPanel detections={detections} threshold={threshold} />
-      <DownloadsCard result={result} visibleDetections={detections} />
     </div>
   );
 }

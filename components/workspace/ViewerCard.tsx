@@ -385,10 +385,10 @@ function ViewerStage({
     <div
       ref={stageRef}
       className={cn(
-        // flex-1 lets the stage absorb whatever height the layout gives the
-        // card (e.g. matching the right rail), with a sane floor otherwise.
-        "relative flex min-h-0 flex-1 overflow-auto bg-surface-0",
-        !fullscreen && "min-h-[clamp(340px,52vh,640px)]"
+        // Fixed stage height: the image fits inside it like an image viewer,
+        // so switching samples never resizes or shifts the layout.
+        "relative flex min-h-0 overflow-auto bg-surface-0",
+        fullscreen ? "flex-1" : "h-[clamp(340px,58vh,680px)]"
       )}
     >
       <div
