@@ -283,20 +283,30 @@ export function Workspace() {
                 runtimeMs={result.runtimeMs}
               />
             </div>
-            <div className="space-y-4">
-              <DetectionsPanel
-                detections={visibleDetections}
-                activeId={activeId}
-                onActiveId={handleActiveId}
-              />
-              <InsightsPanel
-                detections={visibleDetections}
-                threshold={threshold}
-              />
-              <DownloadsCard
-                result={result}
-                visibleDetections={visibleDetections}
-              />
+            {/* At xl the rail content is absolutely positioned so the long
+                detections list can't stretch the grid row — the left column
+                alone sets the height, the list flexes to fill it, and
+                insights + export sit flush with the bottom. */}
+            <div className="xl:relative">
+              <div className="flex flex-col gap-4 xl:absolute xl:inset-0">
+                <DetectionsPanel
+                  detections={visibleDetections}
+                  activeId={activeId}
+                  onActiveId={handleActiveId}
+                />
+                <div className="shrink-0">
+                  <InsightsPanel
+                    detections={visibleDetections}
+                    threshold={threshold}
+                  />
+                </div>
+                <div className="shrink-0">
+                  <DownloadsCard
+                    result={result}
+                    visibleDetections={visibleDetections}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         ) : null}

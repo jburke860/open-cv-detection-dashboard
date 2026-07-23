@@ -52,7 +52,9 @@ export function DetectionsPanel({
   }, [detections, query, sortKey]);
 
   return (
-    <Card>
+    // At xl the card flexes to fill the rail so the export card lines up
+    // with the bottom of the left column; the list absorbs the slack.
+    <Card className="flex min-h-0 flex-col xl:flex-1">
       <CardHeader
         title={`Detections (${detections.length})`}
         subtitle="Click a row to highlight and inspect"
@@ -80,7 +82,9 @@ export function DetectionsPanel({
         </Select>
       </div>
 
-      <ul className="max-h-105 divide-y divide-line overflow-y-auto overscroll-contain">
+      {/* At xl the rail has a definite height, so the list simply flexes
+          to fill whatever insights + export don't use. */}
+      <ul className="max-h-105 divide-y divide-line overflow-y-auto overscroll-contain xl:max-h-none xl:min-h-0 xl:flex-1">
         {rows.length === 0 ? (
           <li className="px-4 py-8 text-center text-xs text-ink-faint">
             {detections.length === 0
