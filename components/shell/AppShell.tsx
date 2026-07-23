@@ -100,7 +100,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </header>
 
-        <main className="min-w-0 flex-1 px-4 py-6 sm:px-6">{children}</main>
+        <main className="min-w-0 flex-1 px-4 py-6 sm:px-6">
+          {/* Cap the content width so ultrawide monitors don't stretch the
+              sample thumbnails and viewer into oversized, empty layouts. */}
+          <div className="mx-auto w-full max-w-[1520px]">{children}</div>
+        </main>
 
         <footer className="border-t border-line px-4 py-4 text-center text-xs text-ink-faint sm:px-6">
           Built with Next.js, Firebase, Cloud Run, and Ultralytics YOLO · Made by Jeremy

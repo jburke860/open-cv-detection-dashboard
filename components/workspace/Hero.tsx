@@ -68,9 +68,11 @@ export function Hero() {
           </p>
 
           <div className="mt-5 flex flex-wrap gap-2 text-sm">
+            {/* On desktop the workspace is already visible below the hero,
+                so the jump link only earns its place on small screens. */}
             <a
               href="#workspace"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-accent-strong bg-accent px-3.5 py-2 font-semibold text-on-accent shadow-[0_0_18px_var(--glow)] transition hover:brightness-110"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-accent-strong bg-accent px-3.5 py-2 font-semibold text-on-accent shadow-[0_0_18px_var(--glow)] transition hover:brightness-110 lg:hidden"
             >
               <ArrowDown className="h-4 w-4" />
               Try the demo
