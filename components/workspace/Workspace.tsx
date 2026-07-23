@@ -262,9 +262,11 @@ export function Workspace() {
         {result ? (
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
             {/* The viewer stretches to match the rail height, and the rail's
-                detections list flexes, so neither column leaves a gap. */}
+                detections list flexes, so neither column leaves a gap.
+                Deliberately not keyed by result.key: remounting on every
+                sample switch blanks the stage for a frame and looks glitchy;
+                the viewer resets its own state when the result changes. */}
             <ViewerCard
-              key={result.key}
               result={result}
               visibleDetections={visibleDetections}
               classChips={classChips}

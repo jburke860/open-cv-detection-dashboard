@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import {
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type PointerEvent as ReactPointerEvent,
@@ -64,8 +65,16 @@ export function ViewerCard({
   const [copied, setCopied] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // Viewer state (tab/zoom) resets between images because the parent keys
-  // this component by result.key.
+  // The component stays mounted across image switches (remounting blanks
+  // the stage for a frame), so reset per-image state during render instead.
+  const [prevResultKey, setPrevResultKey] = useState(result.key);
+  if (prevResultKey !== result.key) {
+    setPrevResultKey(result.key);
+    setTab("annotated");
+    setZoom(1);
+    setComparePos(50);
+  }
+
   useEffect(() => {
     const onFullscreenChange = () =>
       setFullscreen(Boolean(document.fullscreenElement));
@@ -329,17 +338,20 @@ function ViewerStage({
   const draggingRef = useRef(false);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
 
-  useEffect(() => {
+  // Layout effect so the first paint already has a measured stage — an
+  // effect-driven measurement leaves a blank frame before the image appears.
+  useLayoutEffect(() => {
     const stage = stageRef.current;
     if (!stage) return;
 
-    // ResizeObserver fires once on observe, which covers the initial size.
-    const observer = new ResizeObserver(() => {
+    const measure = () =>
       setStageSize({
         width: stage.clientWidth,
         height: stage.clientHeight,
       });
-    });
+
+    measure();
+    const observer = new ResizeObserver(measure);
     observer.observe(stage);
     return () => observer.disconnect();
   }, []);
