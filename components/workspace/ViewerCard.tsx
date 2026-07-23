@@ -311,8 +311,8 @@ function ViewerIconButton({
 const MAX_FIT_UPSCALE = 2;
 
 function ViewerStage({
-  result,
-  visibleDetections,
+  result: incomingResult,
+  visibleDetections: incomingDetections,
   tab,
   zoom,
   comparePos,
@@ -337,6 +337,38 @@ function ViewerStage({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
   const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
+
+  // Swapping the <img> src resizes the frame to the new aspect ratio while
+  // the old bitmap is still on screen, which briefly stretches it — the
+  // "jump". Keep rendering the previous image (and its boxes/dimensions)
+  // until the incoming one is decoded, then swap everything atomically.
+  const [readySrc, setReadySrc] = useState(incomingResult.imageSrc);
+  const shownBundleRef = useRef({
+    result: incomingResult,
+    detections: incomingDetections,
+  });
+  if (readySrc === incomingResult.imageSrc) {
+    shownBundleRef.current = {
+      result: incomingResult,
+      detections: incomingDetections,
+    };
+  }
+  const { result, detections: visibleDetections } = shownBundleRef.current;
+
+  useEffect(() => {
+    if (readySrc === incomingResult.imageSrc) return;
+    let cancelled = false;
+    const loader = new Image();
+    loader.src = incomingResult.imageSrc;
+    const swap = () => {
+      if (!cancelled) setReadySrc(incomingResult.imageSrc);
+    };
+    // Swap even if decode fails so a broken image can't wedge the viewer.
+    loader.decode().then(swap, swap);
+    return () => {
+      cancelled = true;
+    };
+  }, [incomingResult.imageSrc, readySrc]);
 
   // Layout effect so the first paint already has a measured stage — an
   // effect-driven measurement leaves a blank frame before the image appears.
