@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { trackEvent } from "@/lib/analytics";
 import {
   createDetectionJob,
   subscribeToDetectionJob,
@@ -172,6 +173,7 @@ export function useBatchQueue() {
             });
             return created;
           });
+          trackEvent("detection_run", { model: settings.model });
 
           const unsubscribe = subscribeToDetectionJob(
             jobId,

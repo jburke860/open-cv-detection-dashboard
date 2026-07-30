@@ -15,6 +15,7 @@ import {
   jobStatusBadge,
 } from "@/components/workspace/UploadControls";
 import { ViewerCard, type ClassChip } from "@/components/workspace/ViewerCard";
+import { trackEvent } from "@/lib/analytics";
 import {
   DEFAULT_INFERENCE_OPTIONS,
   DETECTION_MODELS,
@@ -245,6 +246,7 @@ export function Workspace() {
           onSelect={(id) => {
             setSelectedSampleId(id);
             setSource("sample");
+            trackEvent("sample_selected", { sample_id: id });
           }}
         />
 

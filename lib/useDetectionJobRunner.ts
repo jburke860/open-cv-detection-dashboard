@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { trackEvent } from "@/lib/analytics";
 import {
   createDetectionJob,
   subscribeToDetectionJob,
@@ -146,6 +147,7 @@ export function useDetectionJobRunner() {
           ...options,
           onUploadProgress: setUploadProgress,
         });
+        trackEvent("detection_run", { model: options.model });
 
         unsubscribeRef.current = subscribeToDetectionJob(
           jobId,

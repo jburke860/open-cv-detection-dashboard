@@ -8,7 +8,14 @@ runConfig:
   # memoryMiB: 512
 
 # Environment variables and secrets.
-# env:
+env:
+  # Public Google Analytics measurement ID; NEXT_PUBLIC_ vars are inlined
+  # into the client bundle at build time.
+  - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+    value: G-8RDS1E05W8
+    availability:
+      - BUILD
+
   # Configure environment variables.
   # See https://firebase.google.com/docs/app-hosting/configure#user-defined-environment
   # - variable: MESSAGE

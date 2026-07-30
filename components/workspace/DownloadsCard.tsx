@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { Button } from "@/components/ui/Button";
 import { Card, CardBody, CardHeader } from "@/components/ui/Card";
+import { trackEvent } from "@/lib/analytics";
 import {
   detectionsToCsv,
   downloadAnnotatedImage,
@@ -41,6 +42,7 @@ export function DownloadsCard({
         detections: visibleDetections,
         filename: `${baseName}-annotated.png`,
       });
+      trackEvent("export_downloaded", { format: "png", artifact: "client" });
     } catch (downloadError) {
       setError(
         downloadError instanceof Error
@@ -67,6 +69,7 @@ export function DownloadsCard({
       ),
       "application/json"
     );
+    trackEvent("export_downloaded", { format: "json", artifact: "client" });
   }
 
   function downloadCsv() {
@@ -76,6 +79,7 @@ export function DownloadsCard({
       detectionsToCsv(visibleDetections),
       "text/csv"
     );
+    trackEvent("export_downloaded", { format: "csv", artifact: "client" });
   }
 
   async function downloadServerArtifact(kind: DetectionArtifactKind) {
@@ -94,6 +98,10 @@ export function DownloadsCard({
             ? "detections.json"
             : "detections.csv";
       downloadRemoteUrl(url, `${baseName}-${suffix}`);
+      trackEvent("export_downloaded", {
+        format: kind === "annotatedImage" ? "png" : kind,
+        artifact: "server",
+      });
     } catch (downloadError) {
       setError(
         downloadError instanceof Error

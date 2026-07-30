@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
+import { AnalyticsBoot } from "@/components/shell/AnalyticsBoot";
 import { AppShell } from "@/components/shell/AppShell";
 import { ThemeProvider } from "@/components/shell/ThemeProvider";
 
@@ -38,6 +39,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="min-h-full font-sans">
+        <AnalyticsBoot />
         <ThemeProvider>
           <AppShell>{children}</AppShell>
         </ThemeProvider>
